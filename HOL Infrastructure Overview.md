@@ -25,18 +25,36 @@ At the end of these HOL sessions you will have deployed the following:
     - Private DNS:
         - Custom Resolvers.
 - **VPC Infrastructure**:
-    - SSH Key
+    - SSH Keys:
+        - Attendee 1
+        - Attendee 2
+    - Security Groups:
+        - VPN
+        - Management
+        - Load balancer
+        - Web
+        - App
+        - DB
+    - Access Control Lists (ACL):
+        - Management
+        - App1
     - Subnets:
         - VPN
         - Management
         - VPE
         - App1
+    - Virtual Network Interface (VNI)
+        - Mgmt Server 
+        - Web Server
+        - App Server
+        - DB Server
     - Virtual Server Instance (VSI)
         - Mgmt Server 
         - Web Server
         - App Server
         - DB Server
     - Client to site VPN server
+    - Site to site VPN gateway
     - Application load balancer
     - Floating IP:
         - Mgmt
@@ -55,100 +73,6 @@ At the end of these HOL sessions you will have deployed the following:
 
 - **Transit Gateway**
     - Local transit gateway
-
-## Hands-on Lab Synopses
-
-The sections below give an overview of each of the HOLS
-
-### Hands-on Lab 1: Introduction to IBM Cloud VPC (120 mins)
-
-What you will learn:
-
-* Core concepts and architecture of IBM Cloud VPC.
-* VPC components: subnets, security groups, ACLs, and virtual server instances.
-* VPC management through UI, CLI, and API interfaces.
-* Implementing VPC subnets, routing tables, and load balancers.
-* Configuring public gateways and floating IP addresses.
-* Audit logging and security monitoring in VPC environments.
-
-### Hands-on Lab 2: IBM Cloud VPC VPN (120 mins)
-
-What you will learn:
-
-* VPC VPN concepts, types, and use cases.
-* Configure and deploy VPN gateways within IBM Cloud VPC.
-* Establish site-to-site and client-to-site VPN connections
-* Monitor and troubleshoot VPN connectivity
-* Apply security best practices for VPN implementations.
-
-### Hands-on Lab 3: Storage Solutions in IBM Cloud VPC (120 mins)
-
-What you will learn:
-
-* Block storage provisioning and management in VPC.
-* File and object storage integration with VPC resources.
-* Storage performance tiers and optimization strategies.
-* Snapshot and backup implementation for VPC storage.
-* VPC encryption options and key management.
-
-### Hands-on Lab 4: Introduction to IBM PowerVS (120 mins)
-What you will learn:
-
-* PowerVS fundamentals and service architecture.
-* Virtual service instance deployment on PowerVS.
-* PowerVS storage volume management.
-* PowerVS management using console, CLI, and API interfaces.
-
-### Hands-on Lab 5: Networking Between VPC and PowerVS (60 mins)
-What you will learn:
-
-* Establishing connectivity between VPC and PowerVS environments.
-* Transit Gateway implementation for multi-region connectivity.
-* Troubleshooting connectivity issues across hybrid infrastructures.
-
-### Hands-on Lab 6: Monitoring, Observability, and Logging Across VPC and PowerVS (120 mins)
-What you will learn:
-
-* Deploying and configuring IBM Cloud Monitoring with Sysdig.
-* Setting up IBM Log Analysis and integrating with VPC/PowerVS workloads.
-* Custom metrics collection from virtual server instances.
-* Building dashboards, setting alerts, and automated incident response.
-* Integrating third-party observability tools with IBM Cloud.
-
-### Hands-on Lab 7: Automation and Infrastructure as Code (60 mins)
-What you will learn:
-
-* Terraform implementation for VPC and PowerVS provisioning
-* Ansible automation for configuration management
-* Creating reusable templates and modules
-* CI/CD pipeline integration for infrastructure deployment
-* Managing infrastructure drift and version control
-
-### Hands-on Lab 8: Protecting Workloads with IBM Cloud Security and Compliance Center Workload Protection (90 mins)
-What you will learn:
-
-* Overview of IBM Cloud Security and Compliance Center Workload Protection.
-* Installing and configuring Workload Protection agents for VPC and PowerVS instances.
-* Policy creation: vulnerability management, compliance enforcement, and threat detection.
-* Real-time security event monitoring and automated response workflows.
-
-### Hands-on Lab 9: IBM Cloud Identity and Access Management (IAM) for VPC and PowerVS (120 mins)
-What you will learn:
-
-* Configure and manage IBM Cloud IAM access policies.
-* Implement role-based access control for users and service accounts.
-* Leveraging service IDs and API keys.
-* Using trusted profiles and context based restrictions.
-* Monitor and audit IAM activities using Cloud Activity Tracker.
-
-### Hands-on Lab 10: IBM Cloud for SAP Specialty (300 mins)
-What you will learn:
-
-* SAP Architecture in IBM Cloud.
-* Compute and Storage Options for SAP.
-* Network / Security and Certifications for SAP.
-* SAP HANA Tuning on PowerVS.
-* SAP HANA Backup COS.
 
 ## Network Addressing
 
@@ -237,7 +161,8 @@ The reserved IP addresses for the subnet **App1** are as follows:
 IP Address | Usage
 ---|---
 10.1.4.4 | Web-Server
-10.1.4.5 | DB-Server (x86)
+10.1.4.5 | App-Server
+10.1.4.6 | DB-Server (x86)
 
 #### PowerVS-DB
 

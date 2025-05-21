@@ -19,19 +19,28 @@ Resource Groups | <TEAM_NAME>-services-rg | Deployed via UI
 Resource Groups | <TEAM_NAME>-management-rg | Deployed via UI
 Resource Groups | <TEAM_NAME>-app1-rg | Deployed via CLI
 API Key | <TEAM_NAME>-api-key-1 | 
+SSH Key | <TEAM_NAME>-ssh-key-1 | Deployed via UI
+SSH Key | <TEAM_NAME>-ssh-key-2 | Deployed via CLI
 VPC | <TEAM_NAME>-management-vpc | Deployed via UI
 VPC | <TEAM_NAME>-app1-vpc | Deployed via CLI
-SSH Key | <TEAM_NAME>key1 | Deployed via UI
-SSH Key | <TEAM_NAME>key2 | Deployed via UI
 Private DNS Instance | <TEAM_NAME>dns | Deployed via UI
 Private DNS Custom Resolvers | |
 Load balancer | <TEAM_NAME>alb-public |
 Floating IP | <TEAM_NAME>mgmt-fip |
 Public Gateway | <TEAM_NAME>pgw-01-pgw | Attach to all VPC subnets
-Subnets | <TEAM_NAME>vpn-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.0.0/24
-Subnets | <TEAM_NAME>mgmt-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.1.0/24
-Subnets | <TEAM_NAME>vpe-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.2.0/24
-Subnets | <TEAM_NAME>app1-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.4.0/24
+Security Group | <TEAM_NAME>vpn-sg | 
+Security Group | <TEAM_NAME>mgmt-sg | 
+Security Group | <TEAM_NAME>vpe-sg | 
+Security Group | <TEAM_NAME>app1-lb-sg | 
+Security Group | <TEAM_NAME>app1-web-sg | 
+Security Group | <TEAM_NAME>app1-app-sg | 
+Security Group | <TEAM_NAME>app1-db-sg | 
+ACL | <TEAM_NAME>mgmt-acl |
+ACL | <TEAM_NAME>app1-acl | 
+Subnet | <TEAM_NAME>vpn-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.0.0/24
+Subnet | <TEAM_NAME>mgmt-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.1.0/24
+Subnet | <TEAM_NAME>vpe-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.2.0/24
+Subnet | <TEAM_NAME>app1-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.4.0/24
 Reserved IP | <TEAM_NAME>mgmt-01-rip | 10.<TEAM_ID_NUMBER>.1.4
 Reserved IP | <TEAM_NAME>mgmt-02-rip | 10.<TEAM_ID_NUMBER>.1.5
 Reserved IP | <TEAM_NAME>web-01-rip | 10.<TEAM_ID_NUMBER>.4.4
@@ -77,43 +86,110 @@ For the third one we will use the CLI:
 4. In the terminal session type: `ibmcloud resource group-create <TEAM_NAME>-app1-rg`
 5. In the terminal session type: `ibmcloud resource groups`
 
+## Create and import SSH Keys
+
+We will learn how to create an SSH key pair and import the public key to IBM Cloud
+
+### Step 1: Create an SSH Key pair for participant 1
+
+On the first participant's laptop, if you are using Linux or MacOS, in a terminal session:
+
+`ssh-keygen -b 4096 -t rsa -f ~/.ssh/hol-key -q -N ""`
+
+If you are using Windows, in a PowerShell session:
+
+`ssh-keygen -b 4096 -t rsa -f C:\%USERPROFILE%\.ssh/hol-key -q -N '""'`
+
+On the second participant's laptop, follow step 1 above
+
+### Step 2: Upload the SSH Public Key using the UI
+
+On the first participants laptop, we will upload the first key to IBM Cloud using the UI.
+
+1. In IBM Cloud console, go to **Navigation menu > Infrastructure VPC icon > Compute > SSH keys**.
+2. Click **Create** and enter the following information:
+
+   * **Location**: us-south
+   * **Name**: <TEAM_NAME>-ssh-key-2
+   * **Resource group**: <TEAM_NAME>-management-rg
+   * **Tags**: env:mgmt
+
+3. Select **Provide existing public key**.
+4. Click **Upload public key**.
+5. Select the public key file and click **Open**. The file extension, `.pub`, typically indicates which file contains the public key.
+6. Click **Create**.
+
+### Step 3: Upload the SSH Public Key using the CLI
+
+On the second participants laptop, we will upload the second key to IBM Cloud using the CLI.
+
+If using Linux or MacOS:
+
+```bash
+ibmcloud is key-create \
+<TEAM_NAME>-ssh-key-2 \
+@KEY_FILE ~/.ssh/hol-key.pub \
+--resource-group-name <TEAM_NAME>-management-rg
+```
+
+Or if using Windows:
+
+```cmd
+ibmcloud is key-create \
+<TEAM_NAME>-ssh-key-2 \
+@KEY_FILE C:\%USERPROFILE%\.ssh/hol-key \
+--resource-group-name <TEAM_NAME>-management-rg
+```
+
+## Create DNS Instance
+
 ## Create VPCs
 
 We will learn how to create VPCs using the IBM Cloud UI and CLI.
 
-By default, each zone of your VPC is assigned a default address prefix that specifies the address range in which subnets are created. As we want to define the IP ranges we will disable this behavior.
+By default, each zone of your VPC is assigned a default address prefix that specifies the address range in which subnets are created. As we want to define the IP ranges we will **disable** this behavior.
 
 ### Step 1: Create VPCs
 
 The first VPC we will create using the UI.
 
-1. Select the Navigation Menu Menu icon, then click VPC Infrastructure > VPCs.
-2. Click Create.
+1. Select the Navigation Menu Menu icon, then click **VPC Infrastructure > VPCs**.
+2. Click **Create +**.
 3. In the Location section, provide the following information:
 
    * **Geography**: `North America`
    * **Region**: `us-south`
   
 4. In the Details section, provide the following information:
+   
    * **Name**: `<TEAM_NAME>-management-vpc`
    * **Resource Group**: `<TEAM_NAME>-management-rg`.
    * **Tags**: `env:mgmt`.
-5. Uncheck the `Create a default prefix for each zone`.
-6. Click Create.
+  
+5. Uncheck the **Create a default prefix for each zone**.
+6. Click **Create**.
 
 ### Step 2: 
 
-1. Navigate to VPC.
+1. Navigate to **VPC**.
 2. Click on `<TEAM_NAME>-management-vpc`.
-3. Click on Address Prefixes.
-4. Clcik on Create:
-5. In the details box?l
+3. Click on **Address Prefixes**.
+4. Click on **Create +**:
+5. In the details box:
+
     * **IP Range**: `10.<TEAM_ID_NUMBER>.0.0/16`
     * **Location**: `us-south-1`
 
 The second VPC we will create using the CLI.
 
-1. In the terminal session type: `ibmcloud is vpc-create <TEAM_NAME>-app1-vpc --resource-group-name <TEAM_NAME>-app1-rg --region us-south`
+1. In the terminal session type:
+
+```bash
+ibmcloud is vpc-create \
+<TEAM_NAME>-app1-vpc \
+--resource-group-name <TEAM_NAME>-app1-rg 
+--region us-south
+```
 
 ## Create Subnets
 
@@ -128,7 +204,7 @@ We will learn how to create subnets using the IBM Cloud UI and CLI.
 We will create two subnets using the UI.
 
 1. Click **Infrastructure > Network > Subnets**.
-2. Click Create.
+2. Click **Create +**.
 3. In the Location section, provide the following information:
 
    * **Geography**: `North America`
@@ -148,6 +224,7 @@ We will create two subnets using the UI.
 5. Click **Create subnet** to create the subnet.
 
 Follow the steps above using the following:
+
    - **Name**: `<TEAM_NAME>mgmt-sn`
    - **Resource group**: `<TEAM_NAME>-management-rg`.
    - **Tags**: `env:mgmt`.
@@ -156,7 +233,7 @@ Follow the steps above using the following:
 
 ### Step 2: Create subnets using the CLI
 
-Now we will use the IBM Cloud CLI
+Now we will use the IBM Cloud CLI.
 
 1. In a terminal session:
 
@@ -244,6 +321,8 @@ Follow the steps above using the following:
 * **name**: `<TEAM_NAME>web-01-rip`.
 * **address**: `.5`
 
+Follow the steps above using the following:
+
 * **name**: `<TEAM_NAME>app-01-rip`.
 * **address**: `.6`
 
@@ -270,49 +349,53 @@ To create a virtual network interface in the console, follow these steps:
   
 4. In the Details section:
 
-   * **Name**: Enter a unique name for the virtual network interface, such as my-virtual-network-interface.
-   * **Resource group**: Select a resource group for the virtual network interface.
-   * **Tags**: (optional) Add tags to help you organize and find your resources. You can add more tags later. For more information, see Working with tags.
+   * **Name**: `<TEAM_NAME>mgmt-01-vni`.
+   * **Resource group**: `<TEAM_NAME>-management-rg`.
+   * **Tags**: `env:mgmt`.
 
-In the Network configuration section, complete the following information:
+5. In the Network configuration section, complete the following information:
 
-Virtual private cloud: Select the VPC in which you want to create your virtual network interface. If you need to create a VPC, click Create VPC.
-Subnet: Select a subnet in which to create the virtual network interface. If you need to create a subnet, click Create.
-Allow IP spoofing: Select the switch to enable or disable IP spoofing.
+   * **Virtual private cloud**: `<TEAM_NAME>-management-vpc`.
+   * **Subnet**: `<TEAM_NAME>mgmt-sn`.
+   * **Allow IP spoofing**: Disabled.
+   * **Infrastructure NAT**: Enabled.
+   * **Protocol state filtering mode**: Auto.
 
-Disabling IP spoofing allows traffic to pass through the network interface, instead of ending at the network interface.
-IP spoofing supports only virtual server instances and bare metal servers. File shares are not supported.
-Infrastructure NAT: Select the switch to enable or disable infrastructure NAT.
+6. In the Security groups section, select `<TEAM_NAME>mgmt-sg`.
+7. In the Primary IP section:
+   
+   * **Reserving method**: `<TEAM_NAME>mgmt-01-rip`.
+   * **Auto release**: Disabled.
 
-Note: Infrastructure NAT is enabled when IP spoofing is enabled.
+8. In the Floating IPs section, click **Attach**. In the side panel, select: `<TEAM_NAME>mgmt-fip`.
+9. Review the information in the Summary panel, and click **Create virtual network interface**.
 
-Enabled includes one floating IP address, and supports virtual servers, bare metal servers, and file shares.
-Disabled supports multiple floating IP addresses only on bare metal servers. Virtual servers and file shares as virtual network interface targets are not supported.
+### Step 2: Create other VNI in the UI
 
-When disabled, the virtual server instance receives the traffic as it was sent by the peer, without NAT. The destination IP address is the floating IP address, and the bare metal server is responsible for performing the NAT.
+For the next VNI we will use the CLI:
 
-Protocol state filtering mode: Select a radio button to set the mode:
+1. Using the CLI
 
-Auto (default): Filtering is enabled or disabled based on the virtual network interface's target resource.
+```bash
+ibmcloud is virtual-network-interface-create \
+--name <TEAM_NAME>mgmt-02-vni \
+--allow-ip-spoofing false \
+--auto-delete false \
+--enable-infrastructure-nat true \
+--protocol-state-filtering-mode auto \
+--rip-name <TEAM_NAME>mgmt-02-rip \
+--subnet <TEAM_NAME>mgmt-sn \
+--sgs <TEAM_NAME>mgmt-sg \
+--resource-group-name <TEAM_NAME>-management-rg \
+--vpc <TEAM_NAME>-management-vpc 
+```
 
-Bare metal server (Disabled)
-Virtual server instance (Enabled)
-File share mount (Enabled)
-Enabled: Forces the TCP connections to align with the RFC793 standard and any packets to be allowed by corresponding security group rules and network ACLs.
-Disabled: Permits packets to be allowed only by corresponding security group rules and network ACLs.
-In the Primary IP section, make the following selections.
+### Step 2: Create the other VNIs with a script
 
-Reserving method: Select whether you want a primary IP address created for you, or if you want to specify one manually. If you specify your own, type an existing reserved IP address for your virtual network interface, or select one from the existing reserved IP list menu.
-Auto release: Click the switch to enable or disable auto release for this virtual network interface.
-In the Floating IPs section (optional), click Attach. In the side panel that appears, you can either select from the existing list of floating IP addresses, or select Reserve new Floating IP and complete the information that is requested.
+For the other VNIs we will a script:
 
-Note: If a floating IP is attached, the virtual network interface will not be accepted as file share mount target. If infrastructure NAT is enabled, at most one floating IP can be attached.
+#### Notes
 
-In the Secondary IP section (optional), click Attach. Select a reserving method, and specify whether auto release is enabled.
-
-Note: A virtual network interface with secondary IPs attached cannot be accepted as a file share mount target.
-
-In the Security groups section, select at least one and at most five security groups to control traffic at the networking level. You can select security groups from the list, or create one by clicking Create. For more information about creating a security group, see Creating security groups.
-Review the information in the Summary panel, and click Create virtual network interface.
-
-
+1. Disabling IP spoofing allows traffic to pass through the network interface, instead of ending at the network interface.
+2. When Infrastructure NAT is disabled, the virtual server instance receives the traffic as it was sent by the peer, without NAT.
+3. Protocol state filtering mode when enabled forces the TCP connections to align with the RFC793 standard and any packets to be allowed by corresponding security group rules and network ACLs. When disabled, permits packets to be allowed only by corresponding security group rules and network ACLs.
