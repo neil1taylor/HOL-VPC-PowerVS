@@ -12,16 +12,7 @@ What you will learn:
 
 - IBM Cloud account with appropriate permissions
 - IBM Cloud CLI installed and configured
-- OpenVPN Client insyalled see [Install a VPN client](https://cloud.ibm.com/docs/vpc?topic=vpc-setting-up-vpn-client#install-vpn-client)
-
-## Architecture Overview
-
-The setup includes:
-- IBM Cloud Secrets Manager instance for certificate management
-- VPC with subnets and security groups
-- Client-to-Site VPN server
-- Certificate authority (CA) and client certificates
-- VPN client configuration
+- OpenVPN Client installed see [Install a VPN client](https://cloud.ibm.com/docs/vpc?topic=vpc-setting-up-vpn-client#install-vpn-client)
 
 ## Overview
 
@@ -29,6 +20,14 @@ IBM Cloud has two VPN services:
 
 * Site-to-site gateways - Connect remote sites to IBM Cloud through a VPN gateway on an IBM Cloud VPC. Route-based or policy-based mode IPsec site-to-site tunnels.
 * Client-to-site servers - Allows users to connect to IBM Cloud resources through secure, encrypted connections via an OpenVPN client to connect to VPN servers on your IBM Cloud VPC via an TLS 1.2/1.3-based secure, encrypted 
+
+The setup includes:
+
+- IBM Cloud Secrets Manager instance for certificate management
+- VPC with subnets and security groups
+- Client-to-Site VPN server
+- Certificate authority (CA) and client certificates
+- VPN client configuration
 
 
 ### Resources that will be deployed in this HOL

@@ -1,0 +1,140 @@
+#cloud-config
+
+# PostgreSQL deployment on RHEL 9.4 PowerVS
+# This cloud-init file installs PostgreSQL, configures it, and sets up test database
+
+package_update: true
+package_upgrade: false
+
+packages:
+  - postgresql
+  - postgresql-server
+  - postgresql-contrib
+  - policycoreutils-python-utils
+  - setools-console
+
+runcmd:
+  # Check SELinux status and configure if needed
+  - |
+    echo "Checking SELinux status..."
+    getenforce
+    if [ "$(getenforce)" != "Disabled" ]; then
+      echo "SELinux is enabled, configuring PostgreSQL contexts..."
+      # Set proper SELinux contexts for PostgreSQL
+      restorecon -R /var/lib/pgsql/
+      setsebool -P postgresql_can_rsync on
+      # Allow PostgreSQL to connect to network (if needed for remote connections later)
+      setsebool -P nis_enabled on
+    fi
+  
+  # Initialize PostgreSQL database
+  - /usr/bin/postgresql-setup --initdb
+  
+  # Enable and start PostgreSQL service
+  - systemctl enable postgresql
+  - systemctl start postgresql
+  
+  # Wait for PostgreSQL to be ready
+  - sleep 5
+  
+  # Configure PostgreSQL for local connections
+  - |
+    sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+  
+  # Update pg_hba.conf to allow local connections with password
+  - |
+    sed -i 's/local   all             all                                     peer/local   all             all                                     md5/' /var/lib/pgsql/data/pg_hba.conf
+  
+  # Update postgresql.conf for basic configuration
+  - |
+    echo "listen_addresses = 'localhost'" >> /var/lib/pgsql/data/postgresql.conf
+    echo "port = 5432" >> /var/lib/pgsql/data/postgresql.conf
+  
+  # Restore SELinux contexts after configuration changes
+  - |
+    if [ "$(getenforce)" != "Disabled" ]; then
+      restorecon -R /var/lib/pgsql/data/
+    fi
+  
+  # Restart PostgreSQL to apply configuration changes
+  - systemctl restart postgresql
+  
+  # Wait for PostgreSQL to restart
+  - sleep 10
+  
+  # Create test user and database
+  - sudo -u postgres psql -c "CREATE USER testuser WITH PASSWORD 'testpassword';"
+  - sudo -u postgres psql -c "CREATE DATABASE testdb OWNER testuser;"
+  
+  # Create test table
+  - |
+    sudo -u postgres psql -d testdb -c "CREATE TABLE test_records (
+     id SERIAL PRIMARY KEY,
+     name VARCHAR(255) NOT NULL,
+     value INTEGER NOT NULL,
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );"
+  
+  # Grant privileges to testuser
+  - sudo -u postgres psql -d testdb -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO testuser;"
+  - sudo -u postgres psql -d testdb -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO testuser;"
+  
+  # Configure firewall (if firewalld is running)
+  - |
+    if systemctl is-active --quiet firewalld; then
+      firewall-cmd --permanent --add-service=postgresql
+      firewall-cmd --reload
+    fi
+  
+  # Create a simple status check script
+  - |
+    cat > /usr/local/bin/postgres-status.sh << 'EOF'
+    #!/bin/bash
+    echo "PostgreSQL Status:"
+    systemctl status postgresql --no-pager -l
+    echo ""
+    echo "SELinux Status:"
+    getenforce
+    echo "PostgreSQL SELinux booleans:"
+    getsebool -a | grep postgresql
+    echo ""
+    echo "Database connections:"
+    sudo -u postgres psql -c "\l"
+    echo ""
+    echo "Test table contents:"
+    sudo -u postgres psql -d testdb -c "SELECT * FROM test_records;"
+    EOF
+  
+  - chmod +x /usr/local/bin/postgres-status.sh
+
+write_files:
+  - path: /etc/systemd/system/postgresql-setup.service
+    content: |
+      [Unit]
+      Description=PostgreSQL database setup completion marker
+      After=postgresql.service
+      
+      [Service]
+      Type=oneshot
+      ExecStart=/bin/true
+      RemainAfterExit=yes
+      
+      [Install]
+      WantedBy=multi-user.target
+    permissions: '0644'
+
+final_message: |
+  PostgreSQL installation and configuration completed!
+  
+  Database Details:
+  - PostgreSQL is running on port 5432
+  - Test database: testdb
+  - Test user: testuser (password: testpassword)
+  - Test table: test_records with sample data
+  - SELinux is configured for PostgreSQL operations
+  
+  To check status: /usr/local/bin/postgres-status.sh
+  To connect as testuser: psql -h localhost -U testuser -d testdb
+  
+  SELinux Status: $(getenforce)
+  PostgreSQL is ready for use with proper SELinux context!

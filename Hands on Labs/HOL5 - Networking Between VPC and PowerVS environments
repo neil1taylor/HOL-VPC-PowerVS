@@ -1,0 +1,17 @@
+# Hands-on Lab 5: Networking Between VPC and PowerVS (60 mins)
+
+What you will learn:
+
+* Establishing connectivity between VPC and PowerVS environments.
+* Transit Gateway implementation for multi-region connectivity.
+* Troubleshooting connectivity issues across hybrid infrastructures.
+
+## Prerequisites
+
+## Overview
+
+### Resources that will be deployed in this HOL
+
+In this HOL, you will deploy the following:
+
+### Steps
