@@ -189,3 +189,48 @@ Time Slot  |  Day 1  | Day 2 | Day 3 | Day 4 | Day 5
 16:00-16:30  |   HOL 2 Q&A |  |  |  | 
 16:30-17:00  |   End of Day Review | HOL 5 Q&A and End of Day Review | HOL 8 Q&A and End of Day Review | End of Day Review
 
+## Resources created
+
+esource Type | Name | Notes
+---------|----------|---------
+Resource Groups | <TEAM_NAME>-services-rg | Deployed via UI
+Resource Groups | <TEAM_NAME>-management-rg | Deployed via UI
+Resource Groups | <TEAM_NAME>-app1-rg | Deployed via CLI
+API Key | <TEAM_NAME>-api-key-1 | 
+SSH Key | <TEAM_NAME>-ssh-key-1 | Deployed via UI
+SSH Key | <TEAM_NAME>-ssh-key-2 | Deployed via CLI
+VPC | <TEAM_NAME>-management-vpc | Deployed via UI
+VPC | <TEAM_NAME>-app1-vpc | Deployed via CLI
+Private DNS Instance | <TEAM_NAME>-dns-srv | Deployed via UI
+Private DNS Custom Resolvers | |
+Load balancer | <TEAM_NAME>-alb-public |
+Floating IP | <TEAM_NAME>-mgmt-fip |
+Public Gateway | <TEAM_NAME>-pgw-01-pgw | Attach to all VPC subnets
+Security Group | <TEAM_NAME>-vpn-sg | 
+Security Group | <TEAM_NAME>-mgmt-sg | 
+Security Group | <TEAM_NAME>-vpe-sg | 
+Security Group | <TEAM_NAME>-app1-lb-sg | 
+Security Group | <TEAM_NAME>-app1-web-sg | 
+Security Group | <TEAM_NAME>-app1-app-sg | 
+Security Group | <TEAM_NAME>-app1-db-sg | 
+ACL | <TEAM_NAME>mgmt-acl |
+ACL | <TEAM_NAME>app1-acl | 
+Subnet | <TEAM_NAME>vpn-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.0.0/24
+Subnet | <TEAM_NAME>mgmt-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.1.0/24
+Subnet | <TEAM_NAME>vpe-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.2.0/24
+Subnet | <TEAM_NAME>app1-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.4.0/24
+Reserved IP | <TEAM_NAME>-mgmt-01-rip | 10.<TEAM_ID_NUMBER>.1.4
+Reserved IP | <TEAM_NAME>-mgmt-02-rip | 10.<TEAM_ID_NUMBER>.1.5
+Reserved IP | <TEAM_NAME>-web-01-rip | 10.<TEAM_ID_NUMBER>.4.4
+Reserved IP | <TEAM_NAME>-app-01-rip | 10.<TEAM_ID_NUMBER>.4.5
+Reserved IP | <TEAM_NAME>-db-01-rip | 10.<TEAM_ID_NUMBER>.4.6
+Virtual Network Interface | <TEAM_NAME>-mgmt-01-vni | Attach RIP
+Virtual Network Interface | <TEAM_NAME>-mgmt-02-vni | Attach RIP
+Virtual Network Interface | <TEAM_NAME>-web-01-vni | Attach RIP
+Virtual Network Interface | <TEAM_NAME>-app-01-vni | Attach RIP
+Virtual Network Interface | <TEAM_NAME>-db-01-vni | Attach RIP
+Virtual Server Instance | <TEAM_NAME>-mgmt-01-vsi | Ubuntu, attach FIP, attach userdata-mgmt-lin
+Virtual Server Instance | <TEAM_NAME>-mgmt-02-vsi | Windows, userdata-mgmt-win
+Virtual Server Instance | <TEAM_NAME>-web-01-vsi | Ubuntu, attach userdata-web
+Virtual Server Instance | <TEAM_NAME>-app-01-vsi | Ubuntu, attach userdata-app
+Virtual Server Instance | <TEAM_NAME>-db-01-vsi | Ubuntu, attach userdata-db

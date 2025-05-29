@@ -151,18 +151,21 @@ IP Address | Usage
 
 Subnet Address | Range of Addresses | Usable IPs | Hosts | Note
 ---|---|---|---|---
-10.1.4.0/24 | 10.1.4.0 - 10.1.4.255 | 10.1.4.1 - 10.1.4.254 | 254 | App1
+10.1.4.0/26 | 10.1.4.0 - 10.1.4.63 | 10.1.4.1 - 10.1.4.62 | 62 | App1-Web
+10.1.4.64/26 | 10.1.4.64 - 10.1.4.127 | 10.1.4.65 - 10.1.4.126 | 62 | App1-App
+10.1.4.128/26 | 10.1.4.128 - 10.1.4.191 | 10.1.4.129 - 10.1.4.190 | 62 | App1-DB
+10.1.4.192/26 | 10.1.4.192 - 10.1.4.255 | 10.1.4.193 - 10.1.4.254 | 62 | App1-Spare
 10.1.5.0/24 | 10.1.5.0 - 10.1.5.255 | 10.1.5.1 - 10.1.5.254 | 254 | Spare
 10.1.6.0/24 | 10.1.6.0 - 10.1.6.255 | 10.1.6.1 - 10.1.6.254 | 254 | Spare
 10.1.7.0/24 | 10.1.7.0 - 10.1.7.255 | 10.1.7.1 - 10.1.7.254 | 254 | Spare
 
-The reserved IP addresses for the subnet **App1** are as follows:
+The reserved IP addresses for the subnets assigned to **App1** are as follows:
 
 IP Address | Usage
 ---|---
 10.1.4.4 | Web-Server
-10.1.4.5 | App-Server
-10.1.4.6 | DB-Server (x86)
+10.1.4.69 | App-Server
+10.1.4.133 | DB-Server (x86)
 
 #### PowerVS-DB
 

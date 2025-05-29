@@ -13,6 +13,8 @@ What you will learn:
 
 In this HOL, you will deploy the following:
 
+CHANGE TO JUST THE MANAGEMENT COMPONENTS
+
 Resource Type | Name | Notes
 ---------|----------|---------
 Resource Groups | <TEAM_NAME>-services-rg | Deployed via UI
@@ -23,39 +25,41 @@ SSH Key | <TEAM_NAME>-ssh-key-1 | Deployed via UI
 SSH Key | <TEAM_NAME>-ssh-key-2 | Deployed via CLI
 VPC | <TEAM_NAME>-management-vpc | Deployed via UI
 VPC | <TEAM_NAME>-app1-vpc | Deployed via CLI
-Private DNS Instance | <TEAM_NAME>dns | Deployed via UI
+Private DNS Instance | <TEAM_NAME>-dns-srv | Deployed via UI
 Private DNS Custom Resolvers | |
-Load balancer | <TEAM_NAME>alb-public |
-Floating IP | <TEAM_NAME>mgmt-fip |
-Public Gateway | <TEAM_NAME>pgw-01-pgw | Attach to all VPC subnets
-Security Group | <TEAM_NAME>vpn-sg | 
-Security Group | <TEAM_NAME>mgmt-sg | 
-Security Group | <TEAM_NAME>vpe-sg | 
-Security Group | <TEAM_NAME>app1-lb-sg | 
-Security Group | <TEAM_NAME>app1-web-sg | 
-Security Group | <TEAM_NAME>app1-app-sg | 
-Security Group | <TEAM_NAME>app1-db-sg | 
-ACL | <TEAM_NAME>mgmt-acl |
-ACL | <TEAM_NAME>app1-acl | 
-Subnet | <TEAM_NAME>vpn-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.0.0/24
-Subnet | <TEAM_NAME>mgmt-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.1.0/24
-Subnet | <TEAM_NAME>vpe-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.2.0/24
-Subnet | <TEAM_NAME>app1-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.4.0/24
-Reserved IP | <TEAM_NAME>mgmt-01-rip | 10.<TEAM_ID_NUMBER>.1.4
-Reserved IP | <TEAM_NAME>mgmt-02-rip | 10.<TEAM_ID_NUMBER>.1.5
-Reserved IP | <TEAM_NAME>web-01-rip | 10.<TEAM_ID_NUMBER>.4.4
-Reserved IP | <TEAM_NAME>app-01-rip | 10.<TEAM_ID_NUMBER>.4.5
-Reserved IP | <TEAM_NAME>db-01-rip | 10.<TEAM_ID_NUMBER>.4.6
-Virtual Network Interface | <TEAM_NAME>mgmt-01-vni | Attach RIP
-Virtual Network Interface | <TEAM_NAME>mgmt-02-vni | Attach RIP
-Virtual Network Interface | <TEAM_NAME>web-01-vni | Attach RIP
-Virtual Network Interface | <TEAM_NAME>app-01-vni | Attach RIP
-Virtual Network Interface | <TEAM_NAME>db-01-vni | Attach RIP
-Virtual Server Instance | <TEAM_NAME>mgmt-01-vsi | Ubuntu, attach FIP, attach userdata-mgmt-lin
-Virtual Server Instance | <TEAM_NAME>mgmt-02-vsi | Windows, userdata-mgmt-win
-Virtual Server Instance | <TEAM_NAME>web-01-vsi | Ubuntu, attach userdata-web
-Virtual Server Instance | <TEAM_NAME>app-01-vsi | Ubuntu, attach userdata-app
-Virtual Server Instance | <TEAM_NAME>db-01-vsi | Ubuntu, attach userdata-db
+Private DNS Zone | team<TEAM_NUMBER>.hol.cloud |
+Load balancer | <TEAM_NAME>-alb-public |
+Floating IP | <TEAM_NAME>-mgmt-fip |
+Public Gateway | <TEAM_NAME>-pgw-01-pgw | Attach to all VPC subnets
+Security Group | <TEAM_NAME>-vpn-sg | 
+Security Group | <TEAM_NAME>-mgmt-sg | 
+Security Group | <TEAM_NAME>-vpe-sg | 
+Security Group | <TEAM_NAME>-nfs-sg | 
+Security Group | <TEAM_NAME>-app1-lb-sg | 
+Security Group | <TEAM_NAME>-app1-web-sg | 
+Security Group | <TEAM_NAME>-app1-app-sg | 
+Security Group | <TEAM_NAME>-app1-db-sg | 
+ACL | <TEAM_NAME>-mgmt-acl |
+ACL | <TEAM_NAME>-app1-acl | 
+Subnet | <TEAM_NAME>-vpn-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.0.0/24
+Subnet | <TEAM_NAME>-mgmt-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.1.0/24
+Subnet | <TEAM_NAME>-vpe-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.2.0/24
+Subnet | <TEAM_NAME>-app1-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.4.0/24
+Reserved IP | <TEAM_NAME>-mgmt-01-rip | 10.<TEAM_ID_NUMBER>.1.4
+Reserved IP | <TEAM_NAME>-mgmt-02-rip | 10.<TEAM_ID_NUMBER>.1.5
+Reserved IP | <TEAM_NAME>-web-01-rip | 10.<TEAM_ID_NUMBER>.4.4
+Reserved IP | <TEAM_NAME>-app-01-rip | 10.<TEAM_ID_NUMBER>.4.5
+Reserved IP | <TEAM_NAME>-db-01-rip | 10.<TEAM_ID_NUMBER>.4.6
+Virtual Network Interface | <TEAM_NAME>-mgmt-01-vni | Attach RIP
+Virtual Network Interface | <TEAM_NAME>-mgmt-02-vni | Attach RIP
+Virtual Network Interface | <TEAM_NAME>-web-01-vni | Attach RIP
+Virtual Network Interface | <TEAM_NAME>-app-01-vni | Attach RIP
+Virtual Network Interface | <TEAM_NAME>-db-01-vni | Attach RIP
+Virtual Server Instance | <TEAM_NAME>-mgmt-01-vsi | Ubuntu, attach FIP, attach userdata-mgmt-lin
+Virtual Server Instance | <TEAM_NAME>-mgmt-02-vsi | Windows, userdata-mgmt-win
+Virtual Server Instance | <TEAM_NAME>-web-01-vsi | Ubuntu, attach userdata-web
+Virtual Server Instance | <TEAM_NAME>-app-01-vsi | Ubuntu, attach userdata-app
+Virtual Server Instance | <TEAM_NAME>-db-01-vsi | Ubuntu, attach userdata-db
 
 This document references:
 
@@ -128,7 +132,7 @@ If using Linux or MacOS:
 ```bash
 ibmcloud is key-create \
 <TEAM_NAME>-ssh-key-2 \
-@KEY_FILE ~/.ssh/hol-key.pub \
+@~/.ssh/hol-key.pub \
 --resource-group-name <TEAM_NAME>-management-rg
 ```
 
@@ -140,8 +144,6 @@ ibmcloud is key-create \
 @KEY_FILE C:\%USERPROFILE%\.ssh/hol-key \
 --resource-group-name <TEAM_NAME>-management-rg
 ```
-
-## Create DNS Instance
 
 ## Create VPCs
 
@@ -190,6 +192,95 @@ ibmcloud is vpc-create \
 --resource-group-name <TEAM_NAME>-app1-rg 
 --region us-south
 ```
+
+## Create DNS Instance
+
+We will learn how to create a DNS instance. IBM Cloud DNS Services provide private DNS to Virtual Private Cloud (VPC) users. Private DNS zones are resolvable only on IBM Cloud, and only from explicitly permitted networks in an account.
+
+### Step 1: Create a DNS Services instance
+
+1. Open the IBM Cloud catalog page and in teh Search box type **DNS** and then select **DNS Services**.
+2. In the **Create** tab:
+ 
+   * **Service name**: <TEAM_NAME>-dns-srv 
+   * **Resource group**: <TEAM_NAME>-management-rg
+   * **Tags**: env:mgmt
+ 
+3. Check the **I have read and agree to the following license agreements** box.
+4. Click **Create**.
+
+### Step 2: Add a DNS zone
+
+1. The Zone page for the service instance should automatically be displayed.
+2. Click the **Create zone** button on the DNS Zones page.
+3. Enter the following:
+ 
+   * Fully qualified domain name for the zone: team<TEAM_NUMBER>.hol.cloud e.g. `team1.hol.cloud`
+
+4. Click **Create zone**
+
+### Step 4: Add a VPC as a permitted network to the DNS zone
+
+1. Select the **Permitted networks** tab.
+2. Click **Add network**.
+3. Select:
+ 
+   * **Region**: us-south
+   * **Network**: <TEAM_NAME>-management-vpc
+
+4. Select the network from the list and click **Add network**.
+
+Repeat this step for the following:
+
+   * **Region**: us-south
+   * **Network**: <TEAM_NAME>-app1-vpc
+
+### Step 5: Add DNS resource A records
+
+1. From the **DNS zones** table, click the zone name team<TEAM_NUMBER>.hol.cloud.
+2. Click **Add Record** to display a panel where you create the record.
+3. Select **type of record** `A`.
+4. Enter:
+ 
+   * **Name**: <TEAM_NAME>-mgmt-01-vsi
+   * **IPv4 Address**: 10.<TEAM_NUMBER>.1.4
+
+5. Click **Save**
+6. Repeat for:
+ 
+   * **Name**: <TEAM_NAME>-mgmt-02-vsi
+   * **IPv4 Address**: 10.<TEAM_NUMBER>.1.5
+
+### Step 6: Add DNS resource PTR records
+
+1. Click **Add Record** to display a panel where you create the record.
+2. Select **type of record** `A`.
+3. Select **existing record**: <TEAM_NAME>-mgmt-01-vsi
+4. Repeat for <TEAM_NAME>-mgmt-02-vsi
+
+## Create a public gateway
+
+A public gateway enables a subnet and all its attached virtual server instances to connect to the internet. By default, subnets do not have access to the public internet. After a subnet is attached to a public gateway, all instances in that subnet can connect to the internet.
+
+We will learn how to create a public gateway using the IBM Cloud UI.
+
+### Step 1: Create a Public Gateway
+
+1. Click Infrastructure > Network > Public gateways.
+2. Click Create.
+3. In the Edit location, enter values for the following fields:
+
+   * **Geography**: `North America`
+   * **Region**: `us-south`
+
+4. Enter values for the following fields under details:
+
+   * Public gateway name - `<TEAM_NAME>pgw-01-pgw`.
+   * Resource group - `<TEAM_NAME>-Management`.
+   * VPC - `<TEAM_NAME>-management-vpc`.
+   * Tags - `env:mgmt`.
+
+5. Click Create.
 
 ## Create Subnets
 
@@ -257,30 +348,6 @@ Follow the steps above using the following:
    - **Virtual private cloud**: `<TEAM_NAME>-app1-vpc`.
    - **IP range selection**: `10.<TEAM_ID_NUMBER>.4.0/24`
 
-## Create a public gateway
-
-A public gateway enables a subnet and all its attached virtual server instances to connect to the internet. By default, subnets do not have access to the public internet. After a subnet is attached to a public gateway, all instances in that subnet can connect to the internet.
-
-We will learn how to create a public gateway using the IBM Cloud UI.
-
-### Step 1: Create a Public Gateway
-
-1. Click Infrastructure > Network > Public gateways.
-2. Click Create.
-3. In the Edit location, enter values for the following fields:
-
-   * **Geography**: `North America`
-   * **Region**: `us-south`
-
-4. Enter values for the following fields under details:
-
-   * Public gateway name - `<TEAM_NAME>pgw-01-pgw`.
-   * Resource group - `<TEAM_NAME>-Management`.
-   * VPC - `<TEAM_NAME>-management-vpc`.
-   * Tags - `env:mgmt`.
-
-5. Click Create.
-
 ## Reserve IP addresses
 
 The reserved IPs capability on VPC allows you to reserve IP addresses for use on your resources. You can specify a particular address or allow the system to select any available address. You can also make a new IP reservation with or without a target with which to bind the address.
@@ -325,6 +392,186 @@ Follow the steps above using the following:
 
 * **name**: `<TEAM_NAME>app-01-rip`.
 * **address**: `.6`
+
+## Create Security Groups
+
+### Step 1: Create a Security Group in the UI
+
+1. Click **Infrastructure > Network > Security groups**.
+2. Click **Create** on the security groups list table.
+3. Configure as follows:
+
+   * **Geography**: North America.
+   * **Region**: us-south
+   * **Name**: <TEAM_NAME>-mgmt-sg.
+   * **Resource group**: <TEAM_NAME>-management-rg.
+   * **Tags**: env:mgmt
+
+4. In **Inbound rules**, click **Create**:
+
+   * **Protocol**: TCP
+   * **Port min**: 22
+   * **Port max**: 22
+   * **Source type**: CIDR block `0.0.0.0/0`
+   * **Destination type**: IP address `10.<TEAM_ID_NUMBER>.1.4`
+
+5. Click **Create**.
+6. Repeat with the following:
+
+   * **Protocol**: TCP
+   * **Port min**: 3389
+   * **Port max**: 3389
+   * **Source type**: CIDR block `10.<TEAM_ID_NUMBER>.1.0/24`
+   * **Destination type**: IP address `10.<TEAM_ID_NUMBER>.1.4`
+
+7. In **Outbound rules**, click **Create**:
+
+   * **Protocol**: TCP
+   * **Port**: Any
+   * **Source type**: Any
+   * **Destination type**: Any
+
+8. Click **Create**.
+9. Click **Create Security group**
+
+### Step 2: Create a Security Group in the CLI
+
+1. Using a terminal session:
+   
+```bash
+ibmcloud is security-group-create \
+<TEAM_NAME>-vpn-sg \
+<TEAM_NAME>-management-vpc \
+--resource-group-name <TEAM_NAME>-management-rg
+```
+
+2. Capture the ID of the created security group for use in the next step
+
+### Step 3: Create a Security Group Rules in the CLI
+
+1. In a terminal session, add an inbound rule:
+
+```bash
+ibmcloud is security-group-rule-add \
+<TEAM_NAME>-vpn-sg \
+inbound \
+udp \
+--vpc <TEAM_NAME>-management-vpc \
+--local 0.0.0.0/0 \
+--remote 0.0.0.0/0
+--port-min 443 \
+--port-max 443
+```
+
+2. Add an outbound rule:
+
+```bash
+ibmcloud is security-group-rule-add \
+<TEAM_NAME>-vpn-sg \
+outbound \
+all \
+--remote 0.0.0.0/0
+```
+
+3. Repeat for a the VPE security group:
+
+   * **Security group name**: <TEAM_NAME>-vpe-sg
+   * **Inbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
+   * **Outbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
+
+4. Repeat for a the NFS security group:
+
+   * **Security group name**: <TEAM_NAME>-nfs-sg
+   * **Inbound rule**: TCP 2049, any, any
+   * **Outbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
+
+## Create ACL
+
+This section creates a network access control list with the following rules:
+
+* Inbound Rules:
+    * Protocol: All
+    * Source: 0.0.0.0/0 (any source)
+    * Action: Allow
+* Outbound Rules:
+    * Protocol: All
+    * Destination: 0.0.0.0/0 (any destination)
+    * Action: Allow
+
+This configuration:
+
+* Exposes all ports and protocols
+* Allows traffic from any source IP
+* Should only be used in development/testing environments
+* Is not recommended for production workloads
+
+For production environments, consider creating more restrictive rules that only allow the specific protocols, ports, and IP ranges your applications actually need.
+
+
+### Step 1: Create an ACL
+
+1. In a terminal session:
+
+   ```bash
+   # Create the ACL
+   ibmcloud is network-acl-create \
+   <TEAM_NAME>-mgmt-acl \
+   --vpc <TEAM_NAME>-management-vpc \
+   --resource-group-name <TEAM_NAME>-management-rg 
+
+   # Add inbound rule to allow all traffic
+   ibmcloud is network-acl-rule-add \
+   <TEAM_NAME>-mgmt-acl \
+   --direction inbound \
+   --action allow \
+   --protocol all \
+   --source 0.0.0.0/0
+
+   # Add outbound rule to allow all traffic  
+   ibmcloud is network-acl-rule-add \
+   <TEAM_NAME>-mgmt-acl \
+   --direction outbound \
+   --action allow \
+   --protocol all \
+   --destination 0.0.0.0/0
+   ```
+
+## Create DNS Custom Resolvers
+
+### Step1: Create DNS Custom Resolvers
+
+1. In a terminal session:
+
+   ```bash
+   # Install the plugin
+   ibmcloud plugin install dns-svcs
+
+   # Target the resource group
+   ibmcloud target -g <TEAM_NAME>-services-rg
+
+   # Get the ID from the name
+   INSTANCE_ID=$(ibmcloud dns instances --output json | jq -r '.[] | select(.name=="<TEAM_NAME>-dns-srv") | .id')
+   ibmcloud dns instance-target $INSTANCE_ID
+
+   # Get the subnet CRN
+   SUBNET_CRN=$(ibmcloud is subnets --output json | jq -r '.[] | select(.name=="<TEAM_NAME>-vpn-sn") | .crn')
+
+   # Create the first resolver
+   ibmcloud dns custom-resolver-create \
+   --name "<TEAM_NAME>-custom-resolver-1" \
+   --description "First custom resolver in VPC subnet" \
+   --location $SUBNET_CRN, $SUBNET_CRN
+
+   # Get the resolver ID
+   RESOLVER_ID=$(ibmcloud dns custom-resolvers --output json | jq -r '.[].id' )
+
+   # Get the IP addresses of the resolvers
+   ibmcloud dns custom-resolver \
+   $RESOLVER_ID \
+   --output json | jq -r '.locations.[].dns_server_ip'
+   ```
+
+2. Record the IP addresses for use in creating a VPN.
 
 ## Create Virtual Network Interfaces
 
@@ -392,10 +639,89 @@ ibmcloud is virtual-network-interface-create \
 
 ### Step 2: Create the other VNIs with a script
 
-For the other VNIs we will a script:
+For the other VNIs we will use a script. The script will create Virtual Network Interfaces (VNIs) in IBM Cloud using parameters from a CSV file. The script:
+
+* Checks if the IBM Cloud CLI is installed and you're logged in
+* Verifies the provided CSV file exists and is readable
+* Processes each row in the CSV file to create VNIs with the specified parameters
+* Provides helpful output and error handling
+
+To use this script from Linux of MacOS:
+
+* Save [it](Scripts/Linux/HOL1/create_vnis.sh) to a file (for example, create_vnis.sh)
+* Make it executable: chmod +x create_vnis.sh
+* Save the [csv file](Scripts/Linux/HOL1/hol1-vnis.csv)
+* Prepare the CSV file by replacing <TEAM_NAME>.
+* Run the script: `./create_vnis.sh your_file.csv`
+
+To use this script from Windows:
+
+* Save [it](Scripts/Windows/HOL1/Create-VNIs.ps1) to a file (for example, Create-VNIs.ps1)
+* Save the [csv file](Scripts/Linux/HOL1/hol1-vnis.csv)
+* Prepare the CSV file by replacing <TEAM_NAME>.
+* Run the script in PowerShell: `.\Create-VNIs.ps1 -CsvFile your_file.csv`
+
+The script will iterate through your CSV file, targeting the appropriate resource group for each entry and creating VNIs using the IBM Cloud CLI command ibmcloud is virtual-network-interface-create.
+
+
 
 #### Notes
 
 1. Disabling IP spoofing allows traffic to pass through the network interface, instead of ending at the network interface.
 2. When Infrastructure NAT is disabled, the virtual server instance receives the traffic as it was sent by the peer, without NAT.
 3. Protocol state filtering mode when enabled forces the TCP connections to align with the RFC793 standard and any packets to be allowed by corresponding security group rules and network ACLs. When disabled, permits packets to be allowed only by corresponding security group rules and network ACLs.
+
+
+## Create Virtual Server Instances
+
+
+### Step 1: Create a VSI in the UI
+
+To create a virtual server instance in the console, follow these steps:
+
+1. In the IBM Cloud console, navigate to **Compute > Virtual server instances**.
+2. Click **Create** the enter the following information:
+
+   * **Gepgraphy**: North America
+   * **Region**: us-south
+   * **Zone**: us-south-1
+   * **Name**: <TEAM_NAME>-mgmt-01-vsi
+   * **Resource group**: <TEAM_NAME>-management-rg.
+   * **Tags**: `env:mgmt` and `backup:yes`
+
+3. Click on **Change image**
+4. Scroll down, select **ibm-ubuntu-24-04-2-minimal-amd64-1** and click **Save**.
+5. Click on **Change profile**
+6. Select **By Scenario** and then select **Web Development and Test**.
+7. Click on  **bx2-2x8** and then click **Save**.
+8. In **SSH keys** select **<TEAM_NAME>-ssh-key-1** and **<TEAM_NAME>-ssh-key-1**.
+9. In **VPC** select **<TEAM_NAME>-management-vpc**.
+10. In **Network attachments with Virtual network interface**, click on the pencil icon (**Edit**)
+11. In **Advanced options**, select **User data** and paste in the following:
+
+```bash
+
+```
+
+Click **Create virtual server**
+
+### Step 2: Create a VSI in the CLI
+
+
+ibmcloud is instance-create \
+<TEAM_NAME>-mgmt-02-vsi \
+<TEAM_NAME>-management-vpc \
+us-south-1 \
+bx2-2x8 \
+<TEAM_NAME>mgmt-sn \
+--image-name ibm-windows-server-2022-full-standard-amd64-25 \
+--key-names <TEAM_NAME>-ssh-key-1 \
+--sgs <TEAM_NAME>-mgmt-sg \
+--resource-group-name <TEAM_NAME>-management-rg \
+--userdata @mgmt-02-vsi.yaml
+
+ibmcloud resource tag-attach --resource-name <TEAM_NAME>-mgmt-02-vsi --tag-names env:mgmt,backup:yes
+
+## Q&A
+Question: Explain the difference between security groups and network ACLs in IBM Cloud VPC.
+Answer: Security groups are stateful firewalls that operate at the instance level and regulate inbound and outbound traffic to virtual server instances. Network ACLs are stateless firewalls that operate at the subnet level, controlling traffic entering and exiting entire subnets. Security groups have allow rules only, while ACLs support both allow and deny rules.
