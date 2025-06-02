@@ -5,7 +5,7 @@ What you will learn:
 * Core concepts and architecture of IBM Cloud VPC.
 * VPC components: subnets, security groups, ACLs, and virtual server instances.
 * VPC management through UI, CLI, and API interfaces.
-* Implementing VPC subnets, routing tables, and load balancers.
+* Implementing private DNS.
 * Configuring public gateways and floating IP addresses.
 * Audit logging and security monitoring in VPC environments.
 
@@ -13,64 +13,86 @@ What you will learn:
 
 In this HOL, you will deploy the following:
 
-CHANGE TO JUST THE MANAGEMENT COMPONENTS
-
 Resource Type | Name | Notes
 ---------|----------|---------
 Resource Groups | <TEAM_NAME>-services-rg | Deployed via UI
 Resource Groups | <TEAM_NAME>-management-rg | Deployed via UI
-Resource Groups | <TEAM_NAME>-app1-rg | Deployed via CLI
-API Key | <TEAM_NAME>-api-key-1 | 
 SSH Key | <TEAM_NAME>-ssh-key-1 | Deployed via UI
 SSH Key | <TEAM_NAME>-ssh-key-2 | Deployed via CLI
 VPC | <TEAM_NAME>-management-vpc | Deployed via UI
-VPC | <TEAM_NAME>-app1-vpc | Deployed via CLI
 Private DNS Instance | <TEAM_NAME>-dns-srv | Deployed via UI
 Private DNS Custom Resolvers | |
 Private DNS Zone | team<TEAM_NUMBER>.hol.cloud |
-Load balancer | <TEAM_NAME>-alb-public |
 Floating IP | <TEAM_NAME>-mgmt-fip |
 Public Gateway | <TEAM_NAME>-pgw-01-pgw | Attach to all VPC subnets
 Security Group | <TEAM_NAME>-vpn-sg | 
 Security Group | <TEAM_NAME>-mgmt-sg | 
 Security Group | <TEAM_NAME>-vpe-sg | 
 Security Group | <TEAM_NAME>-nfs-sg | 
-Security Group | <TEAM_NAME>-app1-lb-sg | 
-Security Group | <TEAM_NAME>-app1-web-sg | 
-Security Group | <TEAM_NAME>-app1-app-sg | 
-Security Group | <TEAM_NAME>-app1-db-sg | 
 ACL | <TEAM_NAME>-mgmt-acl |
-ACL | <TEAM_NAME>-app1-acl | 
 Subnet | <TEAM_NAME>-vpn-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.0.0/24
 Subnet | <TEAM_NAME>-mgmt-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.1.0/24
 Subnet | <TEAM_NAME>-vpe-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.2.0/24
-Subnet | <TEAM_NAME>-app1-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.4.0/24
 Reserved IP | <TEAM_NAME>-mgmt-01-rip | 10.<TEAM_ID_NUMBER>.1.4
 Reserved IP | <TEAM_NAME>-mgmt-02-rip | 10.<TEAM_ID_NUMBER>.1.5
-Reserved IP | <TEAM_NAME>-web-01-rip | 10.<TEAM_ID_NUMBER>.4.4
-Reserved IP | <TEAM_NAME>-app-01-rip | 10.<TEAM_ID_NUMBER>.4.5
-Reserved IP | <TEAM_NAME>-db-01-rip | 10.<TEAM_ID_NUMBER>.4.6
 Virtual Network Interface | <TEAM_NAME>-mgmt-01-vni | Attach RIP
 Virtual Network Interface | <TEAM_NAME>-mgmt-02-vni | Attach RIP
-Virtual Network Interface | <TEAM_NAME>-web-01-vni | Attach RIP
-Virtual Network Interface | <TEAM_NAME>-app-01-vni | Attach RIP
-Virtual Network Interface | <TEAM_NAME>-db-01-vni | Attach RIP
 Virtual Server Instance | <TEAM_NAME>-mgmt-01-vsi | Ubuntu, attach FIP, attach userdata-mgmt-lin
 Virtual Server Instance | <TEAM_NAME>-mgmt-02-vsi | Windows, userdata-mgmt-win
-Virtual Server Instance | <TEAM_NAME>-web-01-vsi | Ubuntu, attach userdata-web
-Virtual Server Instance | <TEAM_NAME>-app-01-vsi | Ubuntu, attach userdata-app
-Virtual Server Instance | <TEAM_NAME>-db-01-vsi | Ubuntu, attach userdata-db
 
 This document references:
 
 - `<TEAM_NAME>` this is your team name e.g. `team-1`
 - `<TEAM_ID_NUMBER>` this is your team number e.g. `1`
 
+## Scenario
+
+In this HOL we will:
+
+* Create Resource Groups:
+    * Step 1: Create Resource Groups using the UI
+    * Step 2: Create Resource Groups using the CLI
+* Create and import SSH Keys:
+    * Step 1: Create an SSH Key pair
+    * Step 2: Upload the SSH Public Key using the UI
+    * Step 3: Upload the SSH Public Key using the CLI
+* Create VPC:
+    * Step 1: Create Management VPC
+    * Step 2: Create VPC prefixes
+* Create DNS Instance:
+    * Step 1: Create a DNS Services instance
+    * Step 2: Add a DNS zone
+    * Step 3: Add a VPC as a permitted network to the DNS zone
+    * Step 4: Add DNS resource A records
+    * Step 5: Add DNS resource PTR records
+* Create a public gateway:
+     * Step 1: Create a Public Gateway
+* Create Subnets:
+    * Step 1: Create subnets using the UI
+    * Step 2: Create subnets using the CLI
+* Reserved IP addresses:
+    * Step 1: Reserve subnet IP addresses using the UI
+    * Step 2: Reserve subnet IP addresses using the UI
+* Create Security Groups:
+    * Step 1: Create a Security Group in the UI
+    * Step 2: Create a Security Group in the CLI
+    * Step 3: Create a Security Group Rules in the CLI
+* Create ACL:
+    * Step 1: Create an ACL
+* Create DNS Custom Resolvers:
+    * Step 1: Create DNS Custom Resolvers
+    * Create Virtual Network Interfaces:
+    * Step 1: Create a VNI in the UI
+    * Step 2: Create other VNI in the UI
+* Create Virtual Server Instances:
+    * Step 1: Create a VSI in the UI
+    * Step 2: Create a VSI in the CLI
+
 ## Create Resource Groups
 
 We will learn how to create Resource Groups using the IBM Cloud UI and CLI.
 
-### Step 1: Create Resource Groups
+### Step 1: Create Resource Groups using the UI
 
 We will create 3 resource groups. Two using the UI and one with the CLI:
 
@@ -81,6 +103,8 @@ We will create 3 resource groups. Two using the UI and one with the CLI:
 5. Name: `<TEAM_NAME>-services-rg`.
 6. Click Create.
 7. Repeat for `<TEAM_NAME>-management-rg`.
+
+### Step 2: Create Resource Groups using the CLI
 
 For the third one we will use the CLI:
 
@@ -94,7 +118,7 @@ For the third one we will use the CLI:
 
 We will learn how to create an SSH key pair and import the public key to IBM Cloud
 
-### Step 1: Create an SSH Key pair for participant 1
+### Step 1: Create an SSH Key pair
 
 On the first participant's laptop, if you are using Linux or MacOS, in a terminal session:
 
@@ -145,13 +169,13 @@ ibmcloud is key-create \
 --resource-group-name <TEAM_NAME>-management-rg
 ```
 
-## Create VPCs
+## Create VPC
 
 We will learn how to create VPCs using the IBM Cloud UI and CLI.
 
 By default, each zone of your VPC is assigned a default address prefix that specifies the address range in which subnets are created. As we want to define the IP ranges we will **disable** this behavior.
 
-### Step 1: Create VPCs
+### Step 1: Create Management VPC
 
 The first VPC we will create using the UI.
 
@@ -171,7 +195,7 @@ The first VPC we will create using the UI.
 5. Uncheck the **Create a default prefix for each zone**.
 6. Click **Create**.
 
-### Step 2: 
+### Step 2: Create VPC prefixes
 
 1. Navigate to **VPC**.
 2. Click on `<TEAM_NAME>-management-vpc`.
@@ -181,17 +205,6 @@ The first VPC we will create using the UI.
 
     * **IP Range**: `10.<TEAM_ID_NUMBER>.0.0/16`
     * **Location**: `us-south-1`
-
-The second VPC we will create using the CLI.
-
-1. In the terminal session type:
-
-```bash
-ibmcloud is vpc-create \
-<TEAM_NAME>-app1-vpc \
---resource-group-name <TEAM_NAME>-app1-rg 
---region us-south
-```
 
 ## Create DNS Instance
 
@@ -219,7 +232,7 @@ We will learn how to create a DNS instance. IBM Cloud DNS Services provide priva
 
 4. Click **Create zone**
 
-### Step 4: Add a VPC as a permitted network to the DNS zone
+### Step 3: Add a VPC as a permitted network to the DNS zone
 
 1. Select the **Permitted networks** tab.
 2. Click **Add network**.
@@ -235,7 +248,7 @@ Repeat this step for the following:
    * **Region**: us-south
    * **Network**: <TEAM_NAME>-app1-vpc
 
-### Step 5: Add DNS resource A records
+### Step 4: Add DNS resource A records
 
 1. From the **DNS zones** table, click the zone name team<TEAM_NUMBER>.hol.cloud.
 2. Click **Add Record** to display a panel where you create the record.
@@ -251,7 +264,7 @@ Repeat this step for the following:
    * **Name**: <TEAM_NAME>-mgmt-02-vsi
    * **IPv4 Address**: 10.<TEAM_NUMBER>.1.5
 
-### Step 6: Add DNS resource PTR records
+### Step 5: Add DNS resource PTR records
 
 1. Click **Add Record** to display a panel where you create the record.
 2. Select **type of record** `A`.
@@ -308,9 +321,9 @@ We will create two subnets using the UI.
    - **Tags**: `env:mgmt`.
    - **Virtual private cloud**: `<TEAM_NAME>-management-vpc`.
    - **IP range selection**: `10.<TEAM_ID_NUMBER>.0.0/24`.
-   - **Routing table**: Select which routing table that you want the new subnet to use.
-   - **Subnet access control list**: Select which access control list you want the new subnet to use.
-   - **Public gateway**: Indicate whether you want the subnet to communicate with the public internet by toggling the switch to Attached. Attaching a public gateway creates a Floating IP and incurs a cost.
+   - **Routing table**: <TEAM_NAME>-mgmt-rt
+   - **Subnet access control list**: <TEAM_NAME>-mgmt-sg
+   - **Public gateway**: <TEAM_NAME>-mgmt-pgw.
 
 5. Click **Create subnet** to create the subnet.
 
@@ -334,8 +347,8 @@ ibmcloud is subnet-create \
 <TEAM_NAME>-management-vpc \
 --zone us-south-1 \
 --ipv4-cidr-block 10.<TEAM_ID_NUMBER>.2.0/24 \
---acl ACL \ <TBD>
---pgw PGW \ <TBD>
+--acl <TEAM_NAME>-vpn-sg \
+--pgw <TEAM_NAME>pgw-01-pgw \
 --rt RT \ <TBD>
 --resource-group-name <TEAM_NAME>-management-rg
 ```
@@ -348,7 +361,7 @@ Follow the steps above using the following:
    - **Virtual private cloud**: `<TEAM_NAME>-app1-vpc`.
    - **IP range selection**: `10.<TEAM_ID_NUMBER>.4.0/24`
 
-## Reserve IP addresses
+## Reserved IP addresses
 
 The reserved IPs capability on VPC allows you to reserve IP addresses for use on your resources. You can specify a particular address or allow the system to select any available address. You can also make a new IP reservation with or without a target with which to bind the address.
 
@@ -507,7 +520,6 @@ This configuration:
 
 For production environments, consider creating more restrictive rules that only allow the specific protocols, ports, and IP ranges your applications actually need.
 
-
 ### Step 1: Create an ACL
 
 1. In a terminal session:
@@ -636,35 +648,6 @@ ibmcloud is virtual-network-interface-create \
 --resource-group-name <TEAM_NAME>-management-rg \
 --vpc <TEAM_NAME>-management-vpc 
 ```
-
-### Step 2: Create the other VNIs with a script
-
-For the other VNIs we will use a script. The script will create Virtual Network Interfaces (VNIs) in IBM Cloud using parameters from a CSV file. The script:
-
-* Checks if the IBM Cloud CLI is installed and you're logged in
-* Verifies the provided CSV file exists and is readable
-* Processes each row in the CSV file to create VNIs with the specified parameters
-* Provides helpful output and error handling
-
-To use this script from Linux of MacOS:
-
-* Save [it](Scripts/Linux/HOL1/create_vnis.sh) to a file (for example, create_vnis.sh)
-* Make it executable: chmod +x create_vnis.sh
-* Save the [csv file](Scripts/Linux/HOL1/hol1-vnis.csv)
-* Prepare the CSV file by replacing <TEAM_NAME>.
-* Run the script: `./create_vnis.sh your_file.csv`
-
-To use this script from Windows:
-
-* Save [it](Scripts/Windows/HOL1/Create-VNIs.ps1) to a file (for example, Create-VNIs.ps1)
-* Save the [csv file](Scripts/Linux/HOL1/hol1-vnis.csv)
-* Prepare the CSV file by replacing <TEAM_NAME>.
-* Run the script in PowerShell: `.\Create-VNIs.ps1 -CsvFile your_file.csv`
-
-The script will iterate through your CSV file, targeting the appropriate resource group for each entry and creating VNIs using the IBM Cloud CLI command ibmcloud is virtual-network-interface-create.
-
-
-
 #### Notes
 
 1. Disabling IP spoofing allows traffic to pass through the network interface, instead of ending at the network interface.
@@ -673,7 +656,6 @@ The script will iterate through your CSV file, targeting the appropriate resourc
 
 
 ## Create Virtual Server Instances
-
 
 ### Step 1: Create a VSI in the UI
 
@@ -693,21 +675,21 @@ To create a virtual server instance in the console, follow these steps:
 4. Scroll down, select **ibm-ubuntu-24-04-2-minimal-amd64-1** and click **Save**.
 5. Click on **Change profile**
 6. Select **By Scenario** and then select **Web Development and Test**.
-7. Click on  **bx2-2x8** and then click **Save**.
+7. Click on **bx2-2x8** and then click **Save**.
 8. In **SSH keys** select **<TEAM_NAME>-ssh-key-1** and **<TEAM_NAME>-ssh-key-1**.
 9. In **VPC** select **<TEAM_NAME>-management-vpc**.
 10. In **Network attachments with Virtual network interface**, click on the pencil icon (**Edit**)
-11. In **Advanced options**, select **User data** and paste in the following:
-
-```bash
-
-```
+11. In **Advanced options**, select **User data** and paste in the yaml from [mgmt-01-vsi.yaml](Scripts/HOL1/Linux/mgmt-01-vsi.yaml).
 
 Click **Create virtual server**
 
 ### Step 2: Create a VSI in the CLI
 
+Now we will create a VSI using the CLI.
 
+1. In a terminal session:
+
+```bash
 ibmcloud is instance-create \
 <TEAM_NAME>-mgmt-02-vsi \
 <TEAM_NAME>-management-vpc \
@@ -719,9 +701,29 @@ bx2-2x8 \
 --sgs <TEAM_NAME>-mgmt-sg \
 --resource-group-name <TEAM_NAME>-management-rg \
 --userdata @mgmt-02-vsi.yaml
+```
 
+2. Use the following to add a tag to the VSI:
+
+```bash
 ibmcloud resource tag-attach --resource-name <TEAM_NAME>-mgmt-02-vsi --tag-names env:mgmt,backup:yes
+```
 
-## Q&A
-Question: Explain the difference between security groups and network ACLs in IBM Cloud VPC.
-Answer: Security groups are stateful firewalls that operate at the instance level and regulate inbound and outbound traffic to virtual server instances. Network ACLs are stateless firewalls that operate at the subnet level, controlling traffic entering and exiting entire subnets. Security groups have allow rules only, while ACLs support both allow and deny rules.
+## Questions
+
+Use [IBM Cloud VPC Documents](https://cloud.ibm.com/docs/vpc?topic=vpc-getting-started) to help you answer the following:
+
+1. What is IBM Cloud Virtual Private Cloud (VPC)?
+2. What are the essential steps to create and configure an IBM Cloud VPC and its attached resources?
+3. Explain the concepts of Regions and Zones in the context of IBM Cloud VPC.
+4. What are the characteristics of subnets in a VPC, and can they span multiple zones?
+5. How do Security Groups and Network Access Control Lists (ACLs) help secure network traffic in a VPC, and how do they differ?
+6. Which of the following cannot span multiple zones?
+   a. A VPC. 
+   b. A Region
+   c. A Subnet. 
+   d. A Public Gateway.
+7. What are the different types of Virtual Servers available for IBM Cloud VPC?
+8. What types of images are available for provisioning virtual servers in VPC?
+9. What SSH key types are supported for connecting to virtual server instances in VPC, and are there any restrictions on their usage?
+10. What are the limits on the number of network interfaces for IBM Cloud VPC virtual server instances, and how do they relate to the instance's vCPU count?

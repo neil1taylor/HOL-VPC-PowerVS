@@ -15,8 +15,7 @@ What you will learn:
 
 ## Overview
 
-PowerVS workspaces are region-specific containers for all your Power Virtual Server resources.
-
+PowerVS workspaces are region-specific containers for all your Power Virtual Server resources. In this Hands on Lab (HOL) we will create a PowerVS virtual server instance, on a private network, protected by a network security group. The VSI will be connected to a public network initially so that it can install a postgres database via cloud-init.
 
 ### Resources that will be deployed in this HOL
 
@@ -35,7 +34,11 @@ This document references:
 
 ### Steps
 
-
+Step 1: Create PowerVS Workspace
+Step 2: Verify SSH Key
+Step 3: Set Up Networks
+Step 4: Deploy Virtual Server Instance (VSI)
+Step 5: Configure Network Security groups
 
 ### Step 1: Create PowerVS Workspace
 
@@ -61,9 +64,16 @@ This document references:
    - **DNS servers**: Use the IP addresses from your private DNS custom resolvers
    - **MTU**: 9000
 
+2. To verify use the following commands:
+
+```bash
+ibmcloud pi subnet list
+ibmcloud pi subnet get <TEAM_NAME>-power-db-sn
+```
+
 ### Step 4: Deploy Virtual Server Instance (VSI)
 
-Follow the documentation at [Creating a Power Systems Virtual Server](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-creating-power-virtual-server) with the following parameters: 
+1. Follow the documentation at [Creating a Power Systems Virtual Server](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-creating-power-virtual-server) with the following parameters: 
 
    - **Instance name**: <TEAM_NAME>db-powervs-vsi
    - **User tags**: `env:app1`
@@ -72,14 +82,25 @@ Follow the documentation at [Creating a Power Systems Virtual Server](https://cl
    - **Operating system**: IBM provides subscription - Linux.
    - **Image**: RHEL9-SP4
    - **Tier**: Tier 3
+   - **Advanced configurations**:
+     - **Specify cloud-init user data**: Enabled
+     - **User data**: Paste contents of [db-powervs-vsi-user-data.yaml](Scripts/HOL4/db-powervs-vsi-user-data.yaml)
    - **Machine Type**: s922
    - **Core type**: Shared uncapped
    - **Profile**: System configuration
    - **Cores**: 0.25
    - **Memory**: 2
+   - **Public networks**: Enable
    - **Network**: <TEAM_NAME>-power-db-sn
 
-## Step 5: Configure Network Security groups
+2. To verify use the following commands:
+ 
+```bash
+ibmcloud pi instance list
+ibmcloud pi instance get <TEAM_NAME>db-powervs-vsi
+```
+
+### Step 5: Configure Network Security groups
 
 Network Security groups enablement and configuration takes a little while, please be patient at each step and ensure the step completes before moving on to the next.
 
@@ -105,8 +126,74 @@ Network Security groups enablement and configuration takes a little while, pleas
           - **Source port range**: 5432-5432
           - **Members**: <TEAM_NAME>db-powervs-vsi
 
+## Verify
 
+In this section we will connect to the VSI and do some storage tests.
 
+### Step1: Basic Storage Information and Health Checks
+
+First, gather information about your storage configuration:
+
+```bash
+# List all block devices
+lsblk
+
+# Show filesystem disk space usage
+df -h
+
+# Display detailed disk information
+fdisk -l
+
+# View LVM configuration if using logical volumes
+sudo lvdisplay
+sudo vgdisplay
+sudo pvdisplay
+
+# Check multipath configuration (common in enterprise environments)
+sudo multipath -ll
+```
+
+### Step 2. **dd command** - Simple throughput testing
+
+```bash
+# Test write performance (be careful with target location)
+dd if=/dev/zero of=/tmp/testfile bs=1M count=1024 oflag=direct
+
+# Test read performance
+dd if=/tmp/testfile of=/dev/null bs=1M iflag=direct
+
+# Clean up
+rm /tmp/testfile
+```
+
+### Step 3. **hdparm** - Basic disk performance
+```bash
+sudo dnf install hdparm
+
+# Test cached read speed
+sudo hdparm -t /dev/sda
+
+# Test direct read speed (bypasses cache)
+sudo hdparm -T /dev/sda
+```
+
+### Step 4. **fio (Flexible I/O Tester)** - Most comprehensive
+
+Install and use fio for detailed I/O performance testing:
+
+```bash
+# Install fio
+sudo dnf install fio
+
+# Random read test
+fio --name=random-read --ioengine=libaio --iodepth=16 --rw=randread --bs=4k --direct=1 --size=1G --numjobs=1 --runtime=60 --time_based
+
+# Random write test
+fio --name=random-write --ioengine=libaio --iodepth=16 --rw=randwrite --bs=4k --direct=1 --size=1G --numjobs=1 --runtime=60 --time_based
+
+# Sequential read test
+fio --name=sequential-read --ioengine=libaio --iodepth=16 --rw=read --bs=1M --direct=1 --size=1G --numjobs=1 --runtime=60 --time_based
+```
 
 ## Additional Information
 

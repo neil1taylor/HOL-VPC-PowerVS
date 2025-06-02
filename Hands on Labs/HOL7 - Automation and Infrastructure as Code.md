@@ -232,12 +232,18 @@ The high level instructions are as follows:
 4. If satisfied, click **Apply plan** to provision the infrastructure.
 5. Monitor the progress of the operation in the Activity section.
 
-### Step 4: Access Your Resources
+### Step 4: Create a connection to the App1 VPC
+
+1. Use the instructions at [Adding a connection](https://cloud.ibm.com/docs/transit-gateway?topic=transit-gateway-adding-connections&interface=cli) to connect the <TEAM_NAME>-app1-vpc VPC. Use the connection name `app1-vpc`.
+
+### Step 5: Access Your Resources
 
 1. Once the deployment is complete, navigate to the **Resources** tab to see the provisioned infrastructure.
 2. You can also go to the IBM Cloud dashboard to view and manage your newly created resources.
 
 ADD ANSIBLE HERE
+
+
 
 
 

@@ -76,7 +76,7 @@ What you will learn:
 * Core concepts and architecture of IBM Cloud VPC.
 * VPC components: subnets, security groups, ACLs, and virtual server instances.
 * VPC management through UI, CLI, and API interfaces.
-* Implementing VPC subnets, routing tables, and load balancers.
+* Implementing private DNS.
 * Configuring public gateways and floating IP addresses.
 * Audit logging and security monitoring in VPC environments.
 

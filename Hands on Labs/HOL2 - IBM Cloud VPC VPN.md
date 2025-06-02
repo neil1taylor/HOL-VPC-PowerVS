@@ -29,8 +29,7 @@ The setup includes:
 - Certificate authority (CA) and client certificates
 - VPN client configuration
 
-
-### Resources that will be deployed in this HOL
+## Resources that will be deployed in this HOL
 
 In this HOL, you will deploy the following:
 
@@ -46,7 +45,9 @@ This document references:
 - `<TEAM_NAME>` this is your team name e.g. `team-1`
 - `<TEAM_ID_NUMBER>` this is your team number e.g. `1`
 
-### Steps
+## Scenario
+
+In this HOL we will:
 
 * Secrets Manager:
     * Step 1: Creating a Secrets Manager instance in the UI
