@@ -446,6 +446,26 @@ The steps are as follows:
 1. Check VPN connection status in both gateways
 2. Use ping between the managements ervers to verify that packets traverse across the VPN
 
+## Questions
+
+Use [VPNs for VPC overview](https://cloud.ibm.com/docs/vpc?topic=vpc-vpn-overview) to help you answer the following:
+
+1. What are the two main types of VPN services offered by IBM Cloud for VPC, and what is their primary purpose?
+2. Describe the high availability characteristics of policy-based and route-based VPN gateways in IBM Cloud VPC.
+3. When planning to deploy a VPN gateway, what is the minimum recommended subnet size, and why are certain IP addresses reserved within that subnet?
+4. How does IBM Cloud VPN for VPC handle IKE local identity and peer gateway address by default, and what customisation options are available?
+5. What crucial network configuration must be enabled on your on-premises VPN device for it to correctly communicate with IBM Cloud VPN for VPC, and which UDP ports must be allowed?
+6. Which of the following statements about Perfect Forward Secrecy (PFS) in IBM Cloud VPN for VPC is true?
+  A. PFS is enabled by default for all VPN connections.
+  B. PFS is a mandatory setting for all VPN connections.
+  C. PFS is disabled by default, but can be optionally enabled for Phase 2
+  D. PFS is only supported for policy-based VPNs.
+
+7. What are the Establish mode options for a VPN connection, and when would you choose Peer only? 
+8. How can you enable the distribution of traffic between the tunnels of a route-based VPN gateway connection for active/active redundancy? What is a key requirement for the peer gateway for this feature?
+9. Which type of IBM Cloud VPN for VPC (policy-based or route-based) currently supports Transit Gateway route advertisement?
+10. What is the purpose of the Dead peer detection (DPD) feature in IBM Cloud VPN for VPC, and what actions can be configured?
+
 ## Additional Information
 
 This section provides additional information that may be useful in the future, It is not part of the hands on lab

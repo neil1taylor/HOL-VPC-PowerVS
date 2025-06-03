@@ -4,9 +4,9 @@
 
 The 5 day course outlined in this document covers IBM Cloud VPC, IAM, Power VS and SAP on IBM Cloud. The course spans 4 days while day 5 of the workshop will be for additional questions, and sessions for ad-hoc topics requested during the previous 4 days.
 
-The workshop audience is expected to be 10 - 20 people from the SAP Operations Team. These participants are a mixture of architects, lead developers, lead operation experts, and lead solution engineers who have several years’ experience across the hyperscalers.
+The workshop audience is expected to be 10 - 20 people from the Operations Team. These participants are a mixture of architects, lead developers, lead operation experts, and lead solution engineers who have several years’ experience across the hyperscalers.
 
-After the workshop the participants will function as teachers for the SAP operations team worldwide.
+After the workshop the participants will function as teachers for the operations team worldwide.
 
 ## Course Overview
 
