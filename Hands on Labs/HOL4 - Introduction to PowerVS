@@ -1,4 +1,4 @@
-# Hands-on Lab 4: Introduction to IBM PowerVS (120 mins)
+# Hands-on Lab 4: Introduction to IBM PowerVS (60 mins)
 
 What you will learn:
 
@@ -7,17 +7,11 @@ What you will learn:
 * PowerVS storage volume management.
 * PowerVS management using console, CLI, and API interfaces.
 
-## Prerequisites
-
-- IBM Cloud account with appropriate permissions
-- PowerVS service access in your desired region
-- Understanding of your networking requirements
-
 ## Overview
 
 PowerVS workspaces are region-specific containers for all your Power Virtual Server resources. In this Hands on Lab (HOL) we will create a PowerVS virtual server instance, on a private network, protected by a network security group. The VSI will be connected to a public network initially so that it can install a postgres database via cloud-init.
 
-### Resources that will be deployed in this HOL
+## Resources that will be deployed in this HOL
 
 In this HOL, you will deploy the following:
 
@@ -32,13 +26,23 @@ This document references:
 - `<TEAM_NAME>` this is your team name e.g. `team-1`
 - `<TEAM_ID_NUMBER>` this is your team number e.g. `1`
 
-### Steps
+## Scenario
 
-Step 1: Create PowerVS Workspace
-Step 2: Verify SSH Key
-Step 3: Set Up Networks
-Step 4: Deploy Virtual Server Instance (VSI)
-Step 5: Configure Network Security groups
+In this HOL we will:
+
+* Deploy PowerVS resources:
+    * Step 1: Create PowerVS Workspace
+    * Step 2: Verify SSH Key
+    * Step 3: Set Up Networks
+    * Step 4: Deploy Virtual Server Instance (VSI)
+    * Step 5: Configure Network Security groups
+* Verify:
+    * Step 1: Basic Storage Information and Health Checks
+    * Step 2. **dd command** - Simple throughput testing
+    * Step 3. **hdparm** - Basic disk performance
+    * Step 4. **fio (Flexible I/O Tester)** - Most comprehensive
+
+## Deploy PowerVS resources
 
 ### Step 1: Create PowerVS Workspace
 
@@ -130,7 +134,7 @@ Network Security groups enablement and configuration takes a little while, pleas
 
 In this section we will connect to the VSI and do some storage tests.
 
-### Step1: Basic Storage Information and Health Checks
+### Step 1: Basic Storage Information and Health Checks
 
 First, gather information about your storage configuration:
 
@@ -226,5 +230,3 @@ The cloud-init file we used:
 
       * postgresql_can_rsync on - Allows PostgreSQL to use rsync for replication
       * nis_enabled on - Allows network connections (useful for future remote access)
-
-

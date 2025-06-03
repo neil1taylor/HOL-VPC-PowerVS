@@ -100,7 +100,7 @@ What you will learn:
 * Snapshot and backup implementation for VPC storage.
 * VPC encryption options and key management.
 
-### Hands-on Lab 4: Introduction to IBM PowerVS (120 mins)
+### Hands-on Lab 4: Introduction to IBM PowerVS (60 mins)
 
 What you will learn:
 
