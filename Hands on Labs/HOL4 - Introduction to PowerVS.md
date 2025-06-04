@@ -199,6 +199,27 @@ fio --name=random-write --ioengine=libaio --iodepth=16 --rw=randwrite --bs=4k --
 fio --name=sequential-read --ioengine=libaio --iodepth=16 --rw=read --bs=1M --direct=1 --size=1G --numjobs=1 --runtime=60 --time_based
 ```
 
+## Questions
+
+1. What is IBM Power Virtual Server in an IBM data centre?
+   A. A physical server deployed in minutes.
+   B. A virtual server (LPAR) offering flexible, secure, and scalable compute capacity for Power enterprise workloads.
+   C. A cloud-native application platform.
+   D. A service exclusively for SAP HANA workloads.
+2. What is the primary function of Network Security Groups (NSGs) in an IBM Power Virtual Server workspace within an IBM data centre?
+3. What is the default high availability solution supported by Power Virtual Server in IBM data centres?
+4. Does IBM provide maintenance for the AIX, IBM i, or Linux operating systems running on Power Virtual Server in IBM data centres? If not, whose responsibility, is it?
+5. Which IBM Cloud service can be integrated with Power Virtual Server to centrally manage an organization's security, risk, and compliance with regulatory standards and industry benchmarks?
+    A. IBM Cloud Object Storage
+    B. IBM Cloud Monitoring
+    C. IBM Cloud Security and Compliance Center Workload Protection
+    D. IBM Cloud IAM
+6. What is a Power Edge Router (PER) in the context of Power Virtual Server in IBM data centres, and what are two key benefits of using a PER-enabled workspace?
+7. Detail the various storage tiers available in IBM Power Virtual Server and their corresponding IOPS performance. What crucial consideration should be made when selecting a storage tier for production workloads?
+8. Describe the architectural role and key benefits of Shared Processor Pools (SPPs) in Power Virtual Server.
+9. How is virtual LAN (VLAN) isolation enforced between different tenants within the IBM Power Virtual Server infrastructure in IBM data centres?
+10. How can a public network be added or removed from a Power Virtual Server instance in an IBM data centre, and what are the implications of toggling its status?
+
 ## Additional Information
 
 ### Cloud-init

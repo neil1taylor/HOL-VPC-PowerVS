@@ -209,8 +209,20 @@ If you have time:
 
 ## Questions
 
-
-
+1. What is IBM Cloud Block Storage for Virtual Private Cloud (VPC) primarily used for?
+2. What are the maximum storage capacity and IOPS for block storage volumes?
+3. Which of the following encryption options are available for your block storage volumes?
+    A. IBM-managed encryption only
+    B. Customer-managed encryption only
+    C. Both IBM-managed and customer-managed encryption
+    D. No encryption is offered
+4. What are the capabilities regarding increasing the size and adjusting the IOPS for file shares, and do these operations cause an outage?
+5. How does I/O size affect file share performance, and what is the basis for IOPS values for all profiles?
+6. How does IBM Cloud Object Storage distribute encrypted data, and what are the different levels of resiliency available for buckets?
+7. What are some important naming conventions and limitations for IBM Cloud Object Storage buckets?
+8. Explain the purpose of Object Lock in IBM Cloud Object Storage and how it achieves data integrity.
+9. What is the required NFS version for File Storage for VPC, and how is data consistency achieved when multiple users perform read and write operations?
+10. Explain the primary purpose of IBM Cloud Backup for VPC and what types of storage resources it supports for automated backups. Also, how are backup policies configured to target these resources?
 
 ## Additiuonal Information
 
