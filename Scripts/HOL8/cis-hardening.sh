@@ -42,15 +42,17 @@ start_section "1.1"
 run_command "apt purge -y cramfs freevxfs hfs hfsplus overlayfs squashfs udf jffs2 usb-storage" "1.1.1 Remove unnecessary filesystems"
 run_command "systemctl mask autofs" "1.1.2 Disable autofs service"
 
-start_section "1.2"
-run_command "apt update && apt upgrade -y" "1.2.1 Update system packages"
+# Skip updates for demo
+#start_section "1.2"
+#run_command "apt update && apt upgrade -y" "1.2.1 Update system packages"
 
-start_section "1.3"
-run_command "apt install -y apparmor-utils apparmor-profiles apparmor-profiles-extra" "1.3.1 Install AppArmor"
-run_command "aa-complain /etc/apparmor.d/*" "1.3.2 Set AppArmor profiles to complain mode"
-run_command 'echo "kernel.randomize_va_space = 2" > /etc/sysctl.d/60-aslr.conf' "1.3.3 Enable ASLR"
-run_command 'echo "kernel.yama.ptrace_scope = 1" > /etc/sysctl.d/60-yama.conf' "1.3.4 Restrict ptrace"
-run_command "sysctl --system" "1.3.5 Apply kernel settings"
+# Skip for demo
+#start_section "1.3"
+#run_command "apt install -y apparmor-utils apparmor-profiles apparmor-profiles-extra" "1.3.1 Install AppArmor"
+#run_command "aa-complain /etc/apparmor.d/*" "1.3.2 Set AppArmor profiles to complain mode"
+#run_command 'echo "kernel.randomize_va_space = 2" > /etc/sysctl.d/60-aslr.conf' "1.3.3 Enable ASLR"
+#run_command 'echo "kernel.yama.ptrace_scope = 1" > /etc/sysctl.d/60-yama.conf' "1.3.4 Restrict ptrace"
+#run_command "sysctl --system" "1.3.5 Apply kernel settings"
 
 start_section "1.4"
 run_command 'echo "* hard core 0" >> /etc/security/limits.conf' "1.4.1 Disable core dumps"
@@ -108,8 +110,8 @@ done
 start_section "2.4"
 run_command "apt purge -y chrony" "2.4.1 Remove Chrony"
 run_command "grep -q '^\[Time\]' /etc/systemd/timesyncd.conf || echo '[Time]' >> /etc/systemd/timesyncd.conf" "2.4.2 Configure timesyncd"
-run_command "sed -i '/^\[Time\]/a NTP=time-a-wwv.nist.gov time-d-wwv.nist.gov' /etc/systemd/timesyncd.conf" "2.4.3 Set NTP servers"
-run_command "sed -i '/^\[Time\]/a FallbackNTP=time-b-wwv.nist.gov time-c-wwv.nist.gov' /etc/systemd/timesyncd.conf" "2.4.4 Set fallback NTP"
+run_command "sed -i '/^\[Time\]/a NTP=161.26.0.6' /etc/systemd/timesyncd.conf" "2.4.3 Set NTP servers"
+run_command "sed -i '/^\[Time\]/a FallbackNTP=161.26.0.6' /etc/systemd/timesyncd.conf" "2.4.4 Set fallback NTP"
 run_command "systemctl restart systemd-timesyncd" "2.4.5 Restart timesync"
 run_command "systemctl enable systemd-timesyncd" "2.4.6 Enable timesync"
 
@@ -227,11 +229,8 @@ run_command 'awk -F: '\''($3 == 0) { print $1 }'\'' /etc/passwd | grep -v "^root
 run_command 'awk -F: '$3=="0"{print $1":"$3}' /etc/group" | tee /var/log/gid0_accounts.log' "5.5.5 Audit duplicate UID 0 accounts"
 run_command 'awk -F: '\''($3 == 0) { print $1 }'\'' /etc/passwd | grep -v "^root$" | tee /var/log/uid0_accounts.log' "6.2.3 Audit duplicate UID 0 accounts"
 
-
-
 # ===============[ SECTION 6: Logging and Auditing ]===============
 start_section "6.1"
-
 run_command 'apt install -y auditd audispd-plugins' "6.1.1 Install auditd"
 run_command 'systemctl --now enable auditd' "6.1.1 Enable auditd service"
 
@@ -407,8 +406,6 @@ run_command 'chown root:shadow /etc/gshadow-' "6.1.9 Set /etc/gshadow- ownership
 echo -e "\nHardening complete. Summary of errors:"
 grep -r "\[✗\]" "$LOG_DIR/section_logs/" | tee "$LOG_DIR/error_summary.log"
 echo -e "\nFull logs available in: $LOG_DIR"
-
-
 
 run_command 'apt-get install -y debsums' "7.5.2 Install package verification"
 run_command 'debsums_init' "7.5.2 Initialize package checksums"

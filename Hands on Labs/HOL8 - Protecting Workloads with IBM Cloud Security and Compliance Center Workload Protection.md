@@ -116,18 +116,16 @@ After a few minutes, you can check the results in the UI for your **Vulnerabilit
 5. Verify your agent is connected correctly under **Integrations / Data Sources / Sysdig Agents**.
 6. Check that your host appears under Inventory. You can filter by the hostname (Resource Name) or type of operating system (Platform).
 
-
-7. The Workload Protection agent will evaluate Linux configuration files to identify failing controls from the enabled Policies. You can see all results in **Posture/Compliance** in the Entire Infrastructure zone or define specific zones for your Linux hosts under Policies/Zones.
-8. The Workload Protection agent provides host and image scanning in Linux hosts, detecting all installed packages and associated vulnerabilities sorted by severity and prioritizing those with a fix available. Access to **Vulnerabilities / Runtime** and search for your host by the hostname or type of system (asset.type is host).
-9.  As soon as the Workload Protection will start detecting threats based on the Runtime Policies that are configured. Access to Threats to see if any event was detected. In this document, you can find how to manage the threat detection policies and rules.
-
 ### Step 4: Compliance
 
-In the UI and documentation Compliances is also known as **Posture Management**. Workload Protection automates compliance checks against various industry standards and best practices, including the CIS Linux Benchmark. It identifies misconfigurations and violations and suggests remediation. =An understanding of the following terminology will be useful:
+In the UI and documentation Compliances is also known as **Posture Management**. Workload Protection automates compliance checks against various industry standards and best practices, including the CIS Linux Benchmark. It identifies misconfigurations and violations and suggests remediation. An understanding of the following terminology will be useful:
 
+* **Policy** - A policy is a group of business, security, compliance, and operations requirements that represent a compliance standard (for example, NIST SP 800-53 Rev 5), benchmark (for example, CIS Distribution Independent Linux Benchmark (Level 1 - Server) v2.0.0) or business policy. A policy includes one or more controls to define a compliance standard, a benchmark, or a business policy.
+* **Control** - A control identifies a potential issue or violation within the environment and the solution to remediate the situation. A control describes a rule, the code that is run to evaluate it, and a remediation playbook to fix the violation that might be detected.
 * **Zone** - A zone is a group of resources that you want to associate together for management and reporting.
 * **Entire infrastructure** - This zone is automatically created. This zone includes all connected data sources. CIS policies are automatically applied to this zone. Findings are reported on the Compliance page.
 
+Compliance results will be shown within a few minutes of installation and scans are refreshed every 24 hours.
 
 1. Navigate to **Compliance / Overview** in the Workload Protection UI.
 2. As we have not setup any Zones the Agents will have been placed into the `Entire Infrastructure` zone.
@@ -139,30 +137,20 @@ In the UI and documentation Compliances is also known as **Posture Management**.
 8. Review the information in the panel,
 9. In the `RESOURCES EVALUATION` section click on the `View remediation`.
 10. Review the remediation in the new panel.
+11. Repeat for other failed checks that are of interest to you.
+12. Review the hardening script at [Scripts/HOL8/cis-hardening.sh](https://github.com/neil1taylor/HOL-VPC-PowerVS/blob/main/Scripts/HOL8/cis-hardening.sh)
+13. In an SSH session to the Ubuntu Management VSI use the command `curl -sSL https://raw.githubusercontent.com/neil1taylor/HOL-VPC-PowerVS/refs/heads/main/Scripts/HOL8/cis-hardening.sh | sudo bash` to download and run the hardening script. 
 
-Repeat for other failed checks that are of interest to you.
+### Step 5: Vulnerability Management (Host Scanning)
+
+The Workload Protection agent scans host packages to detect associated vulnerabilities and prioritizes them based on severity and the availability of fixed versions. Workload Protection streamlines vulnerability prioritization, enabling more efficient patching efforts by focusing on real-world exposure. You can expect the results of a scan to be visible in the UI within 15 minutes max. Scans are refreshed every 12 hours.
+
+1. In the Workload Protection UI, navigate to **Vulnerabilities / Findings / Runtime**.
+2. In the **Asset** section select the management VSI.
+3. Select a package and explore the detailed information available.
 
 
-curl -sSL https://example.com/script.sh | sudo bash
 
-
-Vulnerability Management (Host Scanning)
-◦
-Concept: Workload Protection scans host packages to detect associated vulnerabilities and prioritises them based on severity and the availability of fixed versions.
-◦
-Demo Steps:
-▪
-Go to Vulnerabilities / Runtime in the UI.
-▪
-Filter for Host: Filter the results to specifically show vulnerabilities for your Linux host (e.g., asset.type is host or search by hostname).
-▪
-Review Findings: Display the list of identified vulnerabilities, showing their severity (high, medium, low) and indicating if a fix is available.
-▪
-Highlight "In-Use" Context: This is a key differentiator. Explain that for Linux hosts, Workload Protection adds in-use runtime context to filter out vulnerabilities that are not actually exposed on running applications. This can significantly reduce the number of vulnerabilities that require immediate remediation (by an average of 85%), allowing security teams to focus on the most critical, exploitable issues.
-▪
-Inventory Integration: Mention that the Packages module in Inventory can also track vulnerabilities and analysed packages of images.
-◦
-Insight: Workload Protection streamlines vulnerability prioritisation, enabling more efficient patching efforts by focusing on real-world exposure.
 3.
 Threat Detection and Response (Server EDR)
 ◦
