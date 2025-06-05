@@ -192,8 +192,8 @@ PermitUserEnvironment no
 EOF
 )
 run_command "echo '$SSH_CONF' > /etc/ssh/sshd_config" "5.1.* Configuration of SSH server"
-run_command "sudo systemctl enable ssh" "5.1.1 Enable SSH service"
-run_command "sudo systemctl restart ssh" "5.1.2 Restart SSH service"
+#run_command "sudo systemctl enable ssh" "5.1.1 Enable SSH service"
+#run_command "sudo systemctl restart ssh" "5.1.2 Restart SSH service"
 
 start_section "5.2"
 run_command 'echo "Defaults logfile=/var/log/sudo.log" > /etc/sudoers.d/01_base' "5.2.1 Configure sudo logging"
