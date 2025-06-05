@@ -133,6 +133,7 @@ for mod in "${modules[@]}"; do
     run_command "echo 'install $mod /bin/false' >> /etc/modprobe.d/disable.conf" "3.2.1 Disable $mod"
     run_command "modprobe -r $mod 2>/dev/null || true" "3.2.2 Unload $mod"
 done
+run_command "sysctl -w net.ipv4.conf.all.accept_redirects=0" "3.2.2 Ensure ICMP redirects are not accepted" 
 
 start_section "3.3"
 run_command 'echo "net.ipv4.ip_forward = 0" > /etc/sysctl.d/60-net.conf' "3.3.1 Disable IP forwarding"

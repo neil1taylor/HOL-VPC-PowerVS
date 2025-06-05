@@ -9,54 +9,32 @@ What you will learn:
 
 ## Overview
 
-IBM Cloud Security and Compliance Center Workload Protection is a comprehensive platform designed to find and prioritise software vulnerabilities, detect and respond to threats, and manage configurations, permissions, and compliance from source to runtime in various environments, including hosts and VMs.
-
-While Workload Protection offers **unified and centralized management** for the security and compliance of applications, workloads, and infrastructure across different environments, including IBM Cloud, other cloud providers (like AWS, Azure, GCP), and on-premises systems, including hosts, virtual machines (VMs), containers, and Kubernetes/OpenShift environments, we will focus on Linux and Windows hosts.
+IBM Cloud Security and Compliance Center Workload Protection is a comprehensive platform designed to find and prioritize software vulnerabilities, detect and respond to threats, and manage configurations, permissions, and compliance from source to runtime in various environments, including hosts and VMs. In this hands on lab we have disabled Cloud Security Posture Management (CSPM) to focus on the features of the host agents, For further info on CSPM see Additional Information below.
 
 For standalone Linux and Windows hosts, Workload Protection provides several key features:
 
-*   **Threat Detection and Response (Server Endpoint Detection and Response - EDR)**:
-    *   This feature instruments hosts and VMs through eBPF to inspect all system activity via system calls with a minimal performance footprint.
-    *   It helps identify threats and suspicious activity based on application, network, and host activity by processing syscall events.
-    *   You can investigate incidents with detailed system captures.
-    *   Preemptive blocking is available to prevent blacklisted or malicious binaries from execution.
-    *   Advanced remediation allows for automatic execution of corrective actions, such as killing processes or containers.
-    *   Detection rules like File Integrity Monitoring (FIM) can be defined per scope (path, filename, command, user, etc.) to detect various activities.
-    *   Malware Control Policies can be created to detect malware execution using known malware hashes and YARA rules.
-*   **Posture Management (Cloud Security Posture Management - CSPM)**:
-    *   Workload Protection automates compliance checks for various industry standards and best practices, including CIS Linux Benchmark and CIS Windows Server Benchmarks.
-    *   It scans host configuration files for compliance and benchmarks.
-    *   For Windows Servers, CIS Windows Server 2022 Benchmark v3.0.0 and CIS Windows Server 2019 Benchmark v3.0.1 Posture policies are provided.
-    *   For AIX on PowerVS, it supports CIS AIX Benchmark.
-    *   Compliance results are persisted in an inventory, which enhances resource visibility and prioritization for remediation of violations.
-    *   It offers an **inventory of all your Cloud assets** (compute resources, managed services, identities, entitlements) and hosts, VMs, and clusters, whether in the Cloud or on-premises.
-    *   Users can review host entries in the Inventory by filtering by hostname (`Resource Name`) or operating system type (`Platform`).
-*   **Vulnerability Management (Host Scanning)**:
-    *   This feature scans host packages and detects associated vulnerabilities.
-    *   It identifies the resolution priority based on available fixed versions and severity.
-    *   For Windows Servers, it provides coverage for operating system vulnerabilities from Microsoft Security Response Center and detects non-operating system package vulnerabilities.
-    *   For Linux hosts, it adds **in-use runtime context** to filter out vulnerabilities exposed on running applications, which can reduce the number of vulnerabilities to immediately fix.
-    *   The Inventory also allows tracking vulnerabilities and analyzed packages of images.
-
-### Supported Host Environments
+* **Threat Detection and Response (Server Endpoint Detection and Response - EDR)**:
+    * This feature instruments hosts and VMs through eBPF to inspect all system activity via system calls with a minimal performance footprint.
+    * It helps identify threats and suspicious activity based on application, network, and host activity by processing syscall events.
+    * You can investigate incidents with detailed system captures.
+    * Preemptive blocking is available to prevent blacklisted or malicious binaries from execution.
+    * Advanced remediation allows for automatic execution of corrective actions, such as killing processes or containers.
+    * Detection rules like File Integrity Monitoring (FIM) can be defined per scope (path, filename, command, user, etc.) to detect various activities.
+    * Malware Control Policies can be created to detect malware execution using known malware hashes and YARA rules.
+* **Vulnerability Management (Host Scanning)**:
+    * This feature scans host packages and detects associated vulnerabilities.
+    * It identifies the resolution priority based on available fixed versions and severity.
+    * For Windows Servers, it provides coverage for operating system vulnerabilities from Microsoft Security Response Center and detects non-operating system package vulnerabilities.
+    * For Linux hosts, it adds **in-use runtime context** to filter out vulnerabilities exposed on running applications, which can reduce the number of vulnerabilities to immediately fix.
+* **Compliance (Posture management)**: 
+    * Allows the evaluation of standalone Hosts against a number of benchmarks, such as CIS Distribution Independent Linux Benchmark or other compliance policies.
+    * This functionality is provided by the the Kubernetes Security Posture Management (KSPM) analyzer. Results will be shown within a few minutes of installation and scans are refreshed every 24 hours.
 
 Workload Protection supports deploying agents on a variety of hosts:
 
-*   **Linux hosts**: This includes IBM Cloud, other cloud providers (AWS, Azure, GCP), or on-premises. Support exists for Debian, Ubuntu, CentOS, RHEL, Fedora, Amazon AMI, and Amazon Linux. Power Virtual Server (PowerVS) Linux hosts are also supported.
+*   **Linux hosts**: This includes IBM Cloud VSIs, other cloud providers (AWS, Azure, GCP), or on-premises or VMs hosted on hypervisors such as VMware. Support exists for Debian, Ubuntu, CentOS, RHEL, Fedora, Amazon AMI, and Amazon Linux. Power Virtual Server (PowerVS) Linux hosts are also supported.
 *   **AIX servers on PowerVS**: Posture compliance for AIX operating system is provided.
 *   **Windows Servers**: Compliance scanning and host scanning for standalone Windows Server hosts are supported.
-
-The Workload Protection agent is deployed on target hosts to collect events and protect workloads.
-
-
-
-**Verifying Results in UI (for Linux hosts)**:
-*   Access your Workload Protection instance and verify your agent is connected under **Integrations / Data Sources / Sysdig Agents**.
-*   Review your host under **Inventory** (filter by hostname or Platform).
-*   See vulnerability reports under **Vulnerabilities / Runtime** (search by hostname or `asset.type is host`).
-*   View posture validation results under **Posture/Compliance**.
-*   Check for detected threats under **Threats**.
-
 
 ## Resources that will be deployed in this HOL
 
@@ -64,7 +42,7 @@ In this HOL, you will deploy the following:
 
 Resource Type | Name | Notes
 ---------|----------|---------
-
+Workload Protection instance | <TEAM_NAME>-scc-wp-svc
 
 ## Scenario
 
@@ -83,7 +61,7 @@ In this HOL we will:
 * **Tags**: `env:mgmt`
 * **Enable Cloud Security Posture Management (CSPM) for your IBM Cloud account**: Disabled
 
-We have disabled **Cloud Security Posture Management** in this hands on lab so that we can focus on the workload protection features. If you have time at the end of this lab then enable CSPM and investigate,
+We have disabled **Cloud Security Posture Management** in this hands on lab so that we can focus on the workload protection features. If you have time at the end of this lab then enable CSPM and investigate it's features.
 
 ### Step 2: Install a Workload Protection Agent for Linux
 
@@ -132,14 +110,14 @@ Compliance results will be shown within a few minutes of installation and scans 
 3. In the `Select Zones` select `Entire Infrastructure` and in `Selct policies` select `CIS Distribution Independent Linux`.
 4. Select a Policy, **CIS Linux Benchmark**.
 5. Select `3.2.2 Ensure ICMP redirects are not accepted (Scored)`.
-6. Select `3.2.1 Ensure source routed packets are not accepted (Scoredd)`.
-7. Select `Show Results` next to `sysctl reports appropriate net.ipv4.conf.default.accept_source`
-8. Review the information in the panel,
-9. In the `RESOURCES EVALUATION` section click on the `View remediation`.
-10. Review the remediation in the new panel.
-11. Repeat for other failed checks that are of interest to you.
-12. Review the hardening script at [Scripts/HOL8/cis-hardening.sh](https://github.com/neil1taylor/HOL-VPC-PowerVS/blob/main/Scripts/HOL8/cis-hardening.sh)
-13. In an SSH session to the Ubuntu Management VSI use the command `curl -sSL https://raw.githubusercontent.com/neil1taylor/HOL-VPC-PowerVS/refs/heads/main/Scripts/HOL8/cis-hardening.sh | sudo bash` to download and run the hardening script. 
+6. Select `Show Results` next to `sysctl reports appropriate net.ipv4.conf.default.accept_source`
+7. Review the information in the panel,
+8. In the `RESOURCES EVALUATION` section click on the `View remediation`.
+9.  Review the remediation in the new panel.
+10. Repeat for other failed checks that are of interest to you.
+11. Review the hardening script at [Scripts/HOL8/cis-hardening.sh](https://github.com/neil1taylor/HOL-VPC-PowerVS/blob/main/Scripts/HOL8/cis-hardening.sh)
+12. In an SSH session to the Ubuntu Management VSI use the command `curl -sSL https://raw.githubusercontent.com/neil1taylor/HOL-VPC-PowerVS/refs/heads/main/Scripts/HOL8/cis-hardening.sh | sudo bash` to download and run the hardening script.
+13. Once the script completes, restart the agent to force a re-scan `sudo systemctl restart dragent`
 
 ### Step 5: Vulnerability Management (Host Scanning)
 
@@ -148,34 +126,71 @@ The Workload Protection agent scans host packages to detect associated vulnerabi
 1. In the Workload Protection UI, navigate to **Vulnerabilities / Findings / Runtime**.
 2. In the **Asset** section select the management VSI.
 3. Select a package and explore the detailed information available.
+4. If you have vulnerabilities, use `sudo apt update && sudo apt update -y` to update the OS packages.
+5. Restart the agent to force a re-scan `sudo systemctl restart dragent`
+6. Wait up to 15 mins and then review the vulnerabilities to see if they have reduced.
 
+### Step 6: Threat Detection and Response (Server EDR)
 
+Workload Protection instruments Linux hosts via eBPF to inspect all system activity through system calls with minimal performance impact. It uses thousands of out-of-the-box policies, updated weekly by the Sysdig Threat Research team, and supports custom rules using Falco language. It can also detect malware and perform behavioral analysis.
 
-3.
-Threat Detection and Response (Server EDR)
-◦
-Concept: Workload Protection instruments Linux hosts via eBPF to inspect all system activity through system calls with minimal performance impact. It uses thousands of out-of-the-box policies, updated weekly by the Threat Research team, and supports custom rules using Falco language. It can also detect malware and perform behavioral analysis.
-◦
-Demo Scenario (Simulated Attack):
-▪
-Pre-Demo Setup (if time permits): Briefly show enabling or customising a runtime policy under Policies / Runtime Policies in the "Linux Workload" section. For example, a File Integrity Monitoring (FIM) rule. You could also show a Malware Control Policy being created to detect execution based on hashes or YARA rules.
-▪
-Simulate Malicious Activity on the Linux Host:
-•
-File Integrity Violation: On the Linux host, demonstrate modifying a critical system file, such as /etc/passwd or /etc/hosts, or creating a suspicious file in a sensitive directory. For example, echo "malicious_entry" >> /etc/passwd.
-•
-Suspicious Command Execution: Run a command that typically indicates suspicious activity, like attempting to access /dev/mem or using strace on a sensitive process. Or, try to execute a binary that could be associated with known malware (if a custom Malware Control Policy with a YARA rule for a harmless "test malware" signature is set up).
-•
-Preemptive Blocking (if possible): If a policy for preemptive blocking is configured, attempt to execute a blacklisted binary and show it being prevented.
-▪
-Observe Detection in UI:
-•
-Quickly navigate to Threats in the Workload Protection UI.
-•
-Show the real-time alert for the simulated activity. Click into the alert to view the detailed system capture, which provides full context of the incident, including executed commands, file changes, and network connections.
-•
-Discuss how Workload Protection can also perform advanced remediation actions like killing processes or containers automatically.
-•
-Mention the capability to forward security events to SIEM tools like Splunk or QRadar for further correlation.
-◦
-Insight: This demonstrates Workload Protection's ability to provide deep runtime visibility, detect anomalies, and enable rapid incident response, even capturing forensic data for in-depth investigation.
+In this demo scenario we will simulate an attack.
+
+1. Navigate to **Policies / Threat Destection / Runtime Policies**.
+2. Review the policies that are available, and those that are enabled. The policies applicable to Linux are under **Workload**.
+3. Under **Workload**, select the policy **Sysdig Runtime Threat Detection** and review the rules.
+4. Now select **Sysdig Runtime Threat Intelligence**, scroll to **Malicious filenames written** and open the tab.
+5. In the **condition** section click on **malicious_filenames** and review the **items**. Note that one of the items is called **packetcrypt**
+6. In an ssh session to the Linux management VSI, type `touch packetcrypt` to create a file named `packetcrypt`
+7. In the Workload Protection UI, navigate to **Threats / Host & container**.
+8. Review the threat event.
+9. Navigate to **Threats / Investigate / Activity Audit**.
+10. Review the list and find the data source `cmd` for the `touch` command. Click the entry and review the details
+
+### Step 7: Create a premptive blocking policy
+
+When a policy for preemptive blocking is configured, attempts to execute a blacklisted binary will be blocked by killing the process. In this step we will:
+
+* Install `ncat`.
+* Run `ncat` to create a local server to show that it works.
+* Create a rule and attach it to a policy that blocks `ncat` on the host.
+* Run `ncat` and see that it is blocked.
+
+1. In an SSH session on the Linux management VSI,enter `sudo apt install ncat -y`.
+2. Once installed run `netcat -lvp 9999`. You should see `Listening on 0.0.0.0 9999`
+3. Stop the process with `cntrl + c`.
+4. Via the Workload Protection UI navigate to **Policies / Rules Library / Rules**.
+5. Click **Add Rule / Workload**.
+6. In the form enter the following and then **Save**:
+      * **Name**: `Block ncat usage`
+      * **Description**: `Detect and block usage of ncat`
+      * **Condition**: `proc.name in ("ncat", "netcat") and evt.type = execve`
+      * **Output**: `"Blocked netcat usage (user=%user.name command=%proc.cmdline)"`
+      * **Priority**: `ERROR`
+      * **Tags**: `network, blocking`
+7. Select **Policies / Threat Detection / Runtime Policies**.
+8. Click **Add Policy**, and select **Workload**.
+9. In the form enter the following abd then **Save**:
+      * **Name**: `Demo Policy`
+      * **Description**: `My demo policy`
+      * **Severity**: `High`
+      * **Scope**: `Custom Scope`, `host.hostName is <TEAM_NAME>-mgmt-01-vsi`
+      * **Policy Rules**: Use the Import from Library button and then search using `Block ncat usage`
+      * **Kill Process**: Enabled
+10. Wait a few minutes for the policy to be synchronized to the agent.
+11. In the SSH session with the Linux management VSI, run `netcat -lvp 9999`. This time the process should be blocked with `Listening on 0.0.0.0 9999 Killed`
+
+## Additional Information
+
+* **Purpose and Scope of CSPM**: CSPM provides a unified and centralised platform to manage the security and compliance of applications, workloads, and infrastructure across various environments, including IBM Cloud, other cloud providers (AWS, Azure, GCP), and on-premise setups. Its core purpose is to identify misconfigurations and validate compliance against numerous industry standards and laws.
+* **Key Features and Methodology**:
+    * **Configuration Validation**: CSPM automatically evaluates your resources against predefined or custom policies and controls to identify failing configurations. These policies can be based on dozens of out-of-the-box frameworks such as PCI, DORA, CIS, NIST, etc.
+    * **Identity and Access Management**: CSPM includes Cloud Infrastructure Entitlement Management (CIEM) capabilities to gain visibility into cloud identities, manage permissions, identify inactive users or those with excessive permissions, and optimise access policies to grant just enough privileges.
+    * **Infrastructure as Code (IaC) Security Posture**: It can analyse the security posture of IaC, including Terraform, CloudFormation, Helm charts, or YAML manifests.
+    * **Risk Prioritisation**: CSPM provides advanced risk prioritisation by correlating misconfigurations, public exposure, in-use context (such as vulnerabilities and active permissions), and high-confidence threat detection. Risks can be visualised through a correlation vector map to provide full situational awareness beyond static posture evaluation.
+    * **Remediation and Reporting**: It offers assisted remediation instructions to fix failing controls. You can also accept known risks temporarily or permanently, which allows the resource to pass evaluation and improves the compliance score for a zone. Compliance results are typically evaluated once daily and can be reviewed in the UI, with options to download reports as CSV or PDF files.
+
+CSPM requires trusted profiles to enable the IBM Cloud Security and Compliance Center Workload Protection service to interact with and collect resource configurations from other IBM Cloud services. Trusted profiles provide a mechanism for managing permissions without assigning access directly to individual users or service IDs. For Workload Protection to perform CSPM, it needs to collect detailed configuration data about your IBM Cloud resources. This data is aggregated by the App Configuration service. The trusted profile grants App Configuration the necessary access policies, such as "Viewer" and "Service Configuration Reader" roles for "All Account Management services" and "All Identity and Access enabled services," to perform this collection. Two trusted profiles are configured:
+
+* Trusted profile for Workload Protection interaction with Config Service.
+* Trusted profile for App Configuration for collecting service configuration.
