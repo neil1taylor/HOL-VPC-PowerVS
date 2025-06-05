@@ -230,9 +230,10 @@ run_command 'awk -F: '$3=="0"{print $1":"$3}' /etc/group" | tee /var/log/gid0_ac
 run_command 'awk -F: '\''($3 == 0) { print $1 }'\'' /etc/passwd | grep -v "^root$" | tee /var/log/uid0_accounts.log' "6.2.3 Audit duplicate UID 0 accounts"
 
 # ===============[ SECTION 6: Logging and Auditing ]===============
-start_section "6.1"
-run_command 'apt install -y auditd audispd-plugins' "6.1.1 Install auditd"
-run_command 'systemctl --now enable auditd' "6.1.1 Enable auditd service"
+# Skip for demo
+#start_section "6.1"
+#run_command 'apt install -y auditd audispd-plugins' "6.1.1 Install auditd"
+#run_command 'systemctl --now enable auditd' "6.1.1 Enable auditd service"
 
 RULES=$(cat << 'EOF'
 -D
@@ -333,79 +334,83 @@ RULES=$(cat << 'EOF'
 -w /etc/apparmor.d/ -p wa -k MAC-policy
 EOF
 )
-run_command "echo '$RULES' > /etc/audit/rules.d/50-scope.rules" "6.1.2 Configure audit rules"
+#run_command "echo '$RULES' > /etc/audit/rules.d/50-scope.rules" "6.1.2 Configure audit rules"
 # 6.1.3 - Configure auditd storage
-run_command 'echo "max_log_file = 50" >> /etc/audit/auditd.conf' "6.1.3 Set max audit log size (50MB)"
-run_command 'echo "max_log_file_action = rotate" >> /etc/audit/auditd.conf' "6.1.3 Configure log rotation"
-run_command 'echo "num_logs = 40" >> /etc/audit/auditd.conf' "6.1.3 Configure log rotation"
-run_command 'echo "disk_full_action = rotate" >> /etc/audit/auditd.conf' "6.1.3 Configure disk alerts"
-run_command 'echo "space_left_action = email" >> /etc/audit/auditd.conf' "6.1.3 Configure disk alerts"
+#run_command 'echo "max_log_file = 50" >> /etc/audit/auditd.conf' "6.1.3 Set max audit log size (50MB)"
+#run_command 'echo "max_log_file_action = rotate" >> /etc/audit/auditd.conf' "6.1.3 Configure log rotation"
+#run_command 'echo "num_logs = 40" >> /etc/audit/auditd.conf' "6.1.3 Configure log rotation"
+#run_command 'echo "disk_full_action = rotate" >> /etc/audit/auditd.conf' "6.1.3 Configure disk alerts"
+#run_command 'echo "space_left_action = email" >> /etc/audit/auditd.conf' "6.1.3 Configure disk alerts"
 
-start_section "6.2"
+# Skip for demo
+#start_section "6.2"
 
 # 6.2.1 - Configure rsyslog
-run_command 'apt install -y rsyslog' "6.2.1 Install rsyslog"
-run_command 'systemctl --now enable rsyslog' "6.2.1 Enable rsyslog"
+#run_command 'apt install -y rsyslog' "6.2.1 Install rsyslog"
+#run_command 'systemctl --now enable rsyslog' "6.2.1 Enable rsyslog"
 
 # 6.2.2 - Configure logging
-run_command 'echo "*.emerg :omusrmsg:*" >> /etc/rsyslog.d/50-default.conf' "6.2.2 Configure emergency alerts"
-run_command 'echo "mail.* -/var/log/mail.log" >> /etc/rsyslog.d/50-default.conf' "6.2.2 Configure mail logging"
-run_command 'echo "auth,authpriv.* /var/log/auth.log" >> /etc/rsyslog.d/50-default.conf' "6.2.2 Configure auth logging"
+#run_command 'echo "*.emerg :omusrmsg:*" >> /etc/rsyslog.d/50-default.conf' "6.2.2 Configure emergency alerts"
+#run_command 'echo "mail.* -/var/log/mail.log" >> /etc/rsyslog.d/50-default.conf' "6.2.2 Configure mail logging"
+#run_command 'echo "auth,authpriv.* /var/log/auth.log" >> /etc/rsyslog.d/50-default.conf' "6.2.2 Configure auth logging"
 
 # 6.2.3 - Configure log permissions
-run_command 'find /var/log -type f -exec chmod 640 {} \;' "6.2.3 Secure log file permissions"
-run_command 'find /var/log -type d -exec chmod 750 {} \;' "6.2.3 Secure log directory permissions"
-run_command 'chmod 640 /var/log/sudo.log' "6.2.3 Secure sudo log"
+#run_command 'find /var/log -type f -exec chmod 640 {} \;' "6.2.3 Secure log file permissions"
+#run_command 'find /var/log -type d -exec chmod 750 {} \;' "6.2.3 Secure log directory permissions"
+#run_command 'chmod 640 /var/log/sudo.log' "6.2.3 Secure sudo log"
 
-start_section "6.3"
+# Skip for demo
+#start_section "6.3"
 
 # 6.3.1 - Configure logrotate
-run_command 'echo "/var/log/sudo.log {" > /etc/logrotate.d/sudo' "6.3.1 Configure sudo log rotation"
-run_command 'echo "  rotate 12" >> /etc/logrotate.d/sudo' "6.3.1 Keep 12 logs"
-run_command 'echo "  monthly" >> /etc/logrotate.d/sudo' "6.3.1 Monthly rotation"
-run_command 'echo "  compress" >> /etc/logrotate.d/sudo' "6.3.1 Enable compression"
-run_command 'echo "  missingok" >> /etc/logrotate.d/sudo' "6.3.1 Ignore missing"
-run_command 'echo "}" >> /etc/logrotate.d/sudo' "6.3.1 Close config"
+#run_command 'echo "/var/log/sudo.log {" > /etc/logrotate.d/sudo' "6.3.1 Configure sudo log rotation"
+#run_command 'echo "  rotate 12" >> /etc/logrotate.d/sudo' "6.3.1 Keep 12 logs"
+#run_command 'echo "  monthly" >> /etc/logrotate.d/sudo' "6.3.1 Monthly rotation"
+#run_command 'echo "  compress" >> /etc/logrotate.d/sudo' "6.3.1 Enable compression"
+#run_command 'echo "  missingok" >> /etc/logrotate.d/sudo' "6.3.1 Ignore missing"
+#run_command 'echo "}" >> /etc/logrotate.d/sudo' "6.3.1 Close config"
 
 # 6.3.2 - Configure systemd-journal
-run_command 'echo "Storage=persistent" >> /etc/systemd/journald.conf' "6.3.2 Enable persistent journal"
-run_command 'echo "SystemMaxUse=1G" >> /etc/systemd/journald.conf' "6.3.2 Limit journal size"
-run_command 'systemctl restart systemd-journald' "6.3.2 Restart journald"
+#run_command 'echo "Storage=persistent" >> /etc/systemd/journald.conf' "6.3.2 Enable persistent journal"
+#run_command 'echo "SystemMaxUse=1G" >> /etc/systemd/journald.conf' "6.3.2 Limit journal size"
+#run_command 'systemctl restart systemd-journald' "6.3.2 Restart journald"
 
-start_section "6.4"
+# Skip for deno
+#start_section "6.4"
 
 # 6.4.1 - Enable process accounting
-run_command 'apt install -y acct' "6.4.1 Install process accounting"
-run_command 'systemctl --now enable psacct' "6.4.1 Enable process accounting"
+#run_command 'apt install -y acct' "6.4.1 Install process accounting"
+#run_command 'systemctl --now enable psacct' "6.4.1 Enable process accounting"
 
 # 6.4.2 - Configure auditd process tracking
-run_command 'echo "-w /usr/bin/ -p x -k processes" >> /etc/audit/rules.d/50-processes.rules' "6.4.2 Monitor binary execution"
-run_command 'echo "-a always,exit -F arch=b64 -S execve -k processes" >> /etc/audit/rules.d/50-processes.rules' "6.4.2 Audit process execution"
-run_command 'service auditd restart' "6.4.2 Reload audit rules"
+#run_command 'echo "-w /usr/bin/ -p x -k processes" >> /etc/audit/rules.d/50-processes.rules' "6.4.2 Monitor binary execution"
+#run_command 'echo "-a always,exit -F arch=b64 -S execve -k processes" >> /etc/audit/rules.d/50-processes.rules' "6.4.2 Audit process execution"
+#run_command 'service auditd restart' "6.4.2 Reload audit rules"
 
 # ===============[ SECTION 7: Host Based Firewall ]===============
-start_section "6.1"
-run_command 'chmod 644 /etc/passwd' "6.1.2 Set /etc/passwd permissions (644)"
-run_command 'chown root:root /etc/passwd' "6.1.2 Verify /etc/passwd ownership"
-run_command 'chmod 000 /etc/shadow' "6.1.3 Lock /etc/shadow permissions (000)"
-run_command 'chown root:shadow /etc/shadow' "6.1.3 Set /etc/shadow ownership"
-run_command 'chmod 644 /etc/group' "6.1.4 Set /etc/group permissions (644)"
-run_command 'chown root:root /etc/group' "6.1.4 Verify /etc/group ownership"
-run_command 'chmod 000 /etc/gshadow' "6.1.5 Lock /etc/gshadow permissions (000)"
-run_command 'chown root:shadow /etc/gshadow' "6.1.5 Set /etc/gshadow ownership"
-run_command 'chmod 600 /etc/passwd-' "6.1.6 Secure /etc/passwd- backup (600)"
-run_command 'chown root:root /etc/passwd-' "6.1.6 Verify /etc/passwd- ownership"
-run_command 'chmod 600 /etc/shadow-' "6.1.7 Secure /etc/shadow- backup (600)"
-run_command 'chown root:shadow /etc/shadow-' "6.1.7 Set /etc/shadow- ownership"
-run_command 'chmod 600 /etc/group-' "6.1.8 Secure /etc/group- backup (600)"
-run_command 'chown root:root /etc/group-' "6.1.8 Verify /etc/group- ownership"
-run_command 'chmod 600 /etc/gshadow-' "6.1.9 Secure /etc/gshadow- backup (600)"
-run_command 'chown root:shadow /etc/gshadow-' "6.1.9 Set /etc/gshadow- ownership"
+start_section "7.1"
+run_command 'chmod 644 /etc/passwd' "7.1.2 Set /etc/passwd permissions (644)"
+run_command 'chown root:root /etc/passwd' "7.1.2 Verify /etc/passwd ownership"
+run_command 'chmod 000 /etc/shadow' "7.1.3 Lock /etc/shadow permissions (000)"
+run_command 'chown root:shadow /etc/shadow' "7.1.3 Set /etc/shadow ownership"
+run_command 'chmod 644 /etc/group' "7.1.4 Set /etc/group permissions (644)"
+run_command 'chown root:root /etc/group' "7.1.4 Verify /etc/group ownership"
+run_command 'chmod 000 /etc/gshadow' "7.1.5 Lock /etc/gshadow permissions (000)"
+run_command 'chown root:shadow /etc/gshadow' "7.1.5 Set /etc/gshadow ownership"
+run_command 'chmod 600 /etc/passwd-' "7.1.6 Secure /etc/passwd- backup (600)"
+run_command 'chown root:root /etc/passwd-' "7.1.6 Verify /etc/passwd- ownership"
+run_command 'chmod 600 /etc/shadow-' "7.1.7 Secure /etc/shadow- backup (600)"
+run_command 'chown root:shadow /etc/shadow-' "7.1.7 Set /etc/shadow- ownership"
+run_command 'chmod 600 /etc/group-' "7.1.8 Secure /etc/group- backup (600)"
+run_command 'chown root:root /etc/group-' "7.1.8 Verify /etc/group- ownership"
+run_command 'chmod 600 /etc/gshadow-' "7.1.9 Secure /etc/gshadow- backup (600)"
+run_command 'chown root:shadow /etc/gshadow-' "7.1.9 Set /etc/gshadow- ownership"
 
 # Final report
 echo -e "\nHardening complete. Summary of errors:"
 grep -r "\[✗\]" "$LOG_DIR/section_logs/" | tee "$LOG_DIR/error_summary.log"
 echo -e "\nFull logs available in: $LOG_DIR"
 
-run_command 'apt-get install -y debsums' "7.5.2 Install package verification"
-run_command 'debsums_init' "7.5.2 Initialize package checksums"
+# Skip for demo
+#run_command 'apt-get install -y debsums' "7.5.2 Install package verification"
+#run_command 'debsums_init' "7.5.2 Initialize package checksums"
