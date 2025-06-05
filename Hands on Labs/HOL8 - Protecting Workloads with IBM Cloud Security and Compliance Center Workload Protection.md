@@ -117,7 +117,7 @@ Compliance results will be shown within a few minutes of installation and scans 
 10. Repeat for other failed checks that are of interest to you.
 11. Review the hardening script at [Scripts/HOL8/cis-hardening.sh](https://github.com/neil1taylor/HOL-VPC-PowerVS/blob/main/Scripts/HOL8/cis-hardening.sh)
 12. In an SSH session to the Ubuntu Management VSI use the command `curl -sSL https://raw.githubusercontent.com/neil1taylor/HOL-VPC-PowerVS/refs/heads/main/Scripts/HOL8/cis-hardening.sh | sudo bash` to download and run the hardening script.
-13. Once the script completes, restart the agent to force a re-scan `sudo systemctl restart dragent`
+13. You will not be able to see the results of the hardening until the compliance scan is re-run. This can be triggered via the API, but we will wait until the next day to see the changes
 
 ### Step 5: Vulnerability Management (Host Scanning)
 
@@ -126,9 +126,6 @@ The Workload Protection agent scans host packages to detect associated vulnerabi
 1. In the Workload Protection UI, navigate to **Vulnerabilities / Findings / Runtime**.
 2. In the **Asset** section select the management VSI.
 3. Select a package and explore the detailed information available.
-4. If you have vulnerabilities, use `sudo apt update && sudo apt update -y` to update the OS packages.
-5. Restart the agent to force a re-scan `sudo systemctl restart dragent`
-6. Wait up to 15 mins and then review the vulnerabilities to see if they have reduced.
 
 ### Step 6: Threat Detection and Response (Server EDR)
 
@@ -179,6 +176,25 @@ When a policy for preemptive blocking is configured, attempts to execute a black
       * **Kill Process**: Enabled
 10. Wait a few minutes for the policy to be synchronized to the agent.
 11. In the SSH session with the Linux management VSI, run `netcat -lvp 9999`. This time the process should be blocked with `Listening on 0.0.0.0 9999 Killed`
+
+If you still have time in the hands on lab:
+
+* Repeat the steps but use the Windows Management server.
+* Configure Zones and add policies to these zones.
+
+### Step 8: Review the DORA policy
+
+1. In the Workload Protection UI, navigate to **Policies / Posture / Policies**.
+2. In the Search bar enter `DORA`.
+3. Click on `Digital Operational Resilience Act (DORA) - Regulation (EU) 2022/2554`.
+4. Select `Requirements & Controls`.
+5. Under `Article 5, Governance and organisation`, select `Art 5.2(b)` and review the 19 controls.
+6. Click `Article 12, Backup policies and procedures, restoration and recovery procedures and methods`. In the search bar type `VPC`. Review the 12 controls.
+7. On the `Check whether Application Load Balancer for VPC has health check configured when created` control select the menu icon and select `Control Details`.
+   1. Note what other policies include this control.
+   2. Click on each of the following in turn; `Code`, `Remediation Playbook` and `Parameters`.
+
+## Questions
 
 ## Additional Information
 
