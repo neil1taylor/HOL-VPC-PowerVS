@@ -196,6 +196,29 @@ If you still have time in the hands on lab:
 
 ## Questions
 
+1. What is the primary purpose of IBM Cloud Security and Compliance Center Workload Protection?
+    A. To manage billing and invoicing for cloud resources.
+    B. To find and prioritise software vulnerabilities, detect and respond to threats, and manage configurations, permissions, and compliance from source to run.
+    C. To provide general cloud infrastructure monitoring.
+    D. To solely focus on network performance optimisation. 
+2. Which of the following capabilities are supported by the data collected by the IBM Cloud Security and Compliance Center Workload Protection agent?
+    A. Only intrusion detection and incident response.
+    B. Intrusion detection, posture management, vulnerability scanning, and incident response capabilities.
+    C. Just billing information and resource tagging.
+    D. Exclusively network traffic analysis. 
+3. What core technology does Server Endpoint Detection and Response (EDR) use in Linux to inspect all system activity with minimal performance impact on hosts, VMs, and Kubernetes/OpenShift clusters?
+4. Which of the following cloud environments are supported for compliance validation by the Workload Protection posture module?
+    A. IBM Cloud only.
+    B. IBM Cloud, AWS, Azure, and Google Cloud only.
+    C. IBM Cloud, AWS, Azure, GCP,  virtual machines (VSIs for VPC, VMware, PowerVS, IBM Z with Linux), Kubernetes, and OpenShift.
+    D. On-premise environments exclusively.
+5. In IBM Cloud Security and Compliance Center Workload Protection, what is a "zone," and how is it defined? 
+6. What is "risk acceptance" in Workload Protection, and what options are available when accepting a risk?
+7. When implementing Context-Based Restrictions (CBR) for IBM Cloud Security and Compliance Center Workload Protection resources, what is a crucial point regarding their effect on agents?
+8. When deploying a Workload Protection agent on a Linux host, what command can be run to verify if the agent is running, and where would you typically locate its latest log files? 
+9. What open-source language is used to create and customize rules for Server Endpoint Detection and Response (EDR) in Workload Protection?
+10. When implementing CSPM for IBM Cloud, what IBM Cloud service and its feature is used for gathering all resource configuration details, and is there a cost associated with this feature? 
+
 ## Additional Information
 
 * **Purpose and Scope of CSPM**: CSPM provides a unified and centralised platform to manage the security and compliance of applications, workloads, and infrastructure across various environments, including IBM Cloud, other cloud providers (AWS, Azure, GCP), and on-premise setups. Its core purpose is to identify misconfigurations and validate compliance against numerous industry standards and laws.

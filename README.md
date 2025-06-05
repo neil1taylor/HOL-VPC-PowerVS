@@ -122,7 +122,7 @@ What you will learn:
 What you will learn:
 
 * Deploying and configuring IBM Cloud Monitoring with Sysdig.
-* Setting up IBM Log Analysis and integrating with VPC/PowerVS workloads.
+* Setting up IBM Cloud Logs and integrating with VPC/PowerVS workloads.
 * Custom metrics collection from virtual server instances.
 * Building dashboards, setting alerts, and automated incident response.
 * Integrating third-party observability tools with IBM Cloud.
