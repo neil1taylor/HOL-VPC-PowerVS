@@ -98,11 +98,10 @@ We will create 3 resource groups. Two using the UI and one with the CLI:
 
 1. Using a browser navigate to https://cloud.ibm.com
 2. Log in to IBM Cloud.
-3. Go to Manage > Account > Resource Groups.
+3. Go to **Manage / Account / Resource Groups**.
 4. Click Create.
 5. Name: `<TEAM_NAME>-services-rg`.
 6. Click Create.
-7. Repeat for `<TEAM_NAME>-management-rg`.
 
 ### Step 2: Create Resource Groups using the CLI
 
@@ -111,8 +110,9 @@ For the third one we will use the CLI:
 1. Open a terminal session.
 2. In the terminal session type: `ibmcloud login --sso`
 3. Follow the prompts and log on.
-4. In the terminal session type: `ibmcloud resource group-create <TEAM_NAME>-app1-rg`
+4. In the terminal session type: `ibmcloud resource group-create <TEAM_NAME>-management-rg`
 5. In the terminal session type: `ibmcloud resource groups`
+6. Ensure you see the following: `<TEAM_NAME>-management-rg`, `<TEAM_NAME>-services-rg` and `Default`.
 
 ## Create and import SSH Keys
 
@@ -134,11 +134,12 @@ On the second participant's laptop, follow step 1 above
 
 On the first participants laptop, we will upload the first key to IBM Cloud using the UI.
 
-1. In IBM Cloud console, go to **Navigation menu > Infrastructure VPC icon > Compute > SSH keys**.
+1. In IBM Cloud console, go to **Navigation menu / Infrastructure VPC icon / Compute / SSH keys**.
 2. Click **Create** and enter the following information:
 
-   * **Location**: us-south
-   * **Name**: <TEAM_NAME>-ssh-key-2
+   * **Geography**: North America
+   * **Region**: Dallas (us-south)
+   * **Name**: <TEAM_NAME>-ssh-key-1
    * **Resource group**: <TEAM_NAME>-management-rg
    * **Tags**: env:mgmt
 
@@ -162,7 +163,7 @@ ibmcloud is key-create \
 
 Or if using Windows:
 
-```cmd
+```ps1
 ibmcloud is key-create \
 <TEAM_NAME>-ssh-key-2 \
 @KEY_FILE C:\%USERPROFILE%\.ssh/hol-key \
@@ -179,7 +180,7 @@ By default, each zone of your VPC is assigned a default address prefix that spec
 
 The first VPC we will create using the UI.
 
-1. Select the Navigation Menu Menu icon, then click **VPC Infrastructure > VPCs**.
+1. Select the Navigation Menu Menu icon, then click **VPC Infrastructure / VPCs**.
 2. Click **Create +**.
 3. In the Location section, provide the following information:
 
@@ -203,8 +204,20 @@ The first VPC we will create using the UI.
 4. Click on **Create +**:
 5. In the details box:
 
-    * **IP Range**: `10.<TEAM_ID_NUMBER>.0.0/16`
+    * **IP Range**: `10.<TEAM_ID_NUMBER>.0.0/22`
     * **Location**: `us-south-1`
+
+In these hands on labs we are only using one Availability Zone (AZ), when designing your IP schema allow for three AZs.
+
+### Step 3: Rename Default Security Group, ACL and Route Table
+
+1. In the VPC you created click **Overview**.
+2. Note the random names of the default Security Group, ACL and Route Table.
+3. Click on the ACL name one and using **Actiuns / Rename**, rename to:`<TEAM_NAME>-management-vpc-default-acl`.
+4. For the security group and route table, click on the name and use the pencil (edit) button to change the names to:
+
+   * `<TEAM_NAME>-management-vpc-default-sg`
+   * `<TEAM_NAME>-management-vpc-default-rt`
 
 ## Create DNS Instance
 
@@ -216,8 +229,8 @@ We will learn how to create a DNS instance. IBM Cloud DNS Services provide priva
 2. In the **Create** tab:
  
    * **Service name**: <TEAM_NAME>-dns-srv 
-   * **Resource group**: <TEAM_NAME>-management-rg
-   * **Tags**: env:mgmt
+   * **Resource group**: <TEAM_NAME>-services-rg
+   * **Tags**: env:services
  
 3. Check the **I have read and agree to the following license agreements** box.
 4. Click **Create**.
@@ -228,7 +241,7 @@ We will learn how to create a DNS instance. IBM Cloud DNS Services provide priva
 2. Click the **Create zone** button on the DNS Zones page.
 3. Enter the following:
  
-   * Fully qualified domain name for the zone: team<TEAM_NUMBER>.hol.cloud e.g. `team1.hol.cloud`
+   * **Name**: team<TEAM_NUMBER>.hol.cloud e.g. `team1.hol.cloud`
 
 4. Click **Create zone**
 
@@ -238,20 +251,15 @@ We will learn how to create a DNS instance. IBM Cloud DNS Services provide priva
 2. Click **Add network**.
 3. Select:
  
-   * **Region**: us-south
+   * **Region**: Dallas
    * **Network**: <TEAM_NAME>-management-vpc
 
-4. Select the network from the list and click **Add network**.
-
-Repeat this step for the following:
-
-   * **Region**: us-south
-   * **Network**: <TEAM_NAME>-app1-vpc
+4. Click **Add network**.
 
 ### Step 4: Add DNS resource A records
 
 1. From the **DNS zones** table, click the zone name team<TEAM_NUMBER>.hol.cloud.
-2. Click **Add Record** to display a panel where you create the record.
+2. Click **Select record action / Add record** to display a panel where you create the record.
 3. Select **type of record** `A`.
 4. Enter:
  
@@ -267,7 +275,7 @@ Repeat this step for the following:
 ### Step 5: Add DNS resource PTR records
 
 1. Click **Add Record** to display a panel where you create the record.
-2. Select **type of record** `A`.
+2. Select **type of record** `PTR`.
 3. Select **existing record**: <TEAM_NAME>-mgmt-01-vsi
 4. Repeat for <TEAM_NAME>-mgmt-02-vsi
 
@@ -285,10 +293,11 @@ We will learn how to create a public gateway using the IBM Cloud UI.
 
    * **Geography**: `North America`
    * **Region**: `us-south`
+   * **Zone**: `us-south-1`
 
 4. Enter values for the following fields under details:
 
-   * Public gateway name - `<TEAM_NAME>pgw-01-pgw`.
+   * Public gateway name - `<TEAM_NAME>-pgw-01-pgw`.
    * Resource group - `<TEAM_NAME>-Management`.
    * VPC - `<TEAM_NAME>-management-vpc`.
    * Tags - `env:mgmt`.
@@ -307,7 +316,7 @@ We will learn how to create subnets using the IBM Cloud UI and CLI.
 
 We will create two subnets using the UI.
 
-1. Click **Infrastructure > Network > Subnets**.
+1. Click **Infrastructure / Network / Subnets**.
 2. Click **Create +**.
 3. In the Location section, provide the following information:
 
@@ -316,24 +325,25 @@ We will create two subnets using the UI.
 
 4. In the Details section, provide the following information:
 
-   - **Name**: `<TEAM_NAME>vpn-sn`t.
+   - **Name**: `<TEAM_NAME>-vpn-sn`.
    - **Resource group**: `<TEAM_NAME>-management-rg`.
    - **Tags**: `env:mgmt`.
    - **Virtual private cloud**: `<TEAM_NAME>-management-vpc`.
    - **IP range selection**: `10.<TEAM_ID_NUMBER>.0.0/24`.
    - **Routing table**: <TEAM_NAME>-mgmt-rt
    - **Subnet access control list**: <TEAM_NAME>-mgmt-sg
-   - **Public gateway**: <TEAM_NAME>-mgmt-pgw.
+   - **Public gateway**: `Attached`.
 
 5. Click **Create subnet** to create the subnet.
 
 Follow the steps above using the following:
 
-   - **Name**: `<TEAM_NAME>mgmt-sn`
+   - **Name**: `<TEAM_NAME>-mgmt-sn`
    - **Resource group**: `<TEAM_NAME>-management-rg`.
    - **Tags**: `env:mgmt`.
    - **Virtual private cloud**: `<TEAM_NAME>-management-vpc`.
    - **IP range selection**: `10.<TEAM_ID_NUMBER>.1.0/24`
+   - **Public gateway**: `Attached`.
 
 ### Step 2: Create subnets using the CLI
 
@@ -343,23 +353,15 @@ Now we will use the IBM Cloud CLI.
 
 ```bash
 ibmcloud is subnet-create \
-<TEAM_NAME>vpe-sn \
+<TEAM_NAME>-vpe-sn \
 <TEAM_NAME>-management-vpc \
 --zone us-south-1 \
 --ipv4-cidr-block 10.<TEAM_ID_NUMBER>.2.0/24 \
---acl <TEAM_NAME>-vpn-sg \
---pgw <TEAM_NAME>pgw-01-pgw \
---rt RT \ <TBD>
+--acl <TEAM_NAME>-management-vpc-default-acl \
+--pgw <TEAM_NAME>-pgw-01-pgw \
+--rt <TEAM_NAME>-management-vpc-default-rt \
 --resource-group-name <TEAM_NAME>-management-rg
 ```
-
-Follow the steps above using the following:
-
-   - **Name**: `<TEAM_NAME>app1-sn`
-   - **Resource group**: `<TEAM_NAME>-app1-rg `.
-   - **Tags**: `env:app`.
-   - **Virtual private cloud**: `<TEAM_NAME>-app1-vpc`.
-   - **IP range selection**: `10.<TEAM_ID_NUMBER>.4.0/24`
 
 ## Reserved IP addresses
 
@@ -369,19 +371,13 @@ The reserved IPs capability on VPC allows you to reserve IP addresses for use on
 
 To create a unassociated reserved IP, follow these steps:
 
-1. From the IBM Cloud menu, select **Infrastructure > Network > Subnets**.
-2. Select the **subnet**: `<TEAM_NAME>mgmt-sn`.
+1. From the IBM Cloud menu, select **Infrastructure / Network / Subnets**.
+2. Select the **subnet**: `<TEAM_NAME>-mgmt-sn`.
 3. Click the **Reserved IPs** tab.
 4. Click **Create +**.
-5. Enter a **name** for your reserved IP: `<TEAM_NAME>mgmt-01-rip`
+5. Enter a **name** for your reserved IP: `<TEAM_NAME>-mgmt-01-rip`
 6. Select the **address**: `.4`
 7. Click **Reserve IP**.
-
-Follow the steps above using the following:
-
-* **subnet**: `<TEAM_NAME>mgmt-sn`.
-* **name**: `<TEAM_NAME>mgmt-02-rip`.
-* **address**: `.5`
 
 ### Step 2: Reserve subnet IP addresses using the UI
 
@@ -389,28 +385,18 @@ For the rest of the reserved IP addresses we will use the CLI:
 
 ```bash
 ibmcloud is subnet-reserved-ip-create \
-<TEAM_NAME>mgmt-sn \
---vpc <TEAM_NAME>-app1-vpc \
---name <TEAM_NAME>web-01-rip \
---address 10.<TEAM_ID_NUMBER>.4.4 \
+<TEAM_NAME>-mgmt-sn \
+--vpc <TEAM_NAME>-management-vpc \
+--name <TEAM_NAME>-mgmt-02-rip \
+--address 10.<TEAM_ID_NUMBER>.1.5 \
 --auto-delete false
 ```
-
-Follow the steps above using the following:
-
-* **name**: `<TEAM_NAME>web-01-rip`.
-* **address**: `.5`
-
-Follow the steps above using the following:
-
-* **name**: `<TEAM_NAME>app-01-rip`.
-* **address**: `.6`
 
 ## Create Security Groups
 
 ### Step 1: Create a Security Group in the UI
 
-1. Click **Infrastructure > Network > Security groups**.
+1. Click **Infrastructure / Network / Security groups**.
 2. Click **Create** on the security groups list table.
 3. Configure as follows:
 
@@ -431,18 +417,18 @@ Follow the steps above using the following:
 5. Click **Create**.
 6. Repeat with the following:
 
-   * **Protocol**: TCP
-   * **Port min**: 3389
-   * **Port max**: 3389
+   * **Protocol**: `TCP`
+   * **Port min**: `3389`
+   * **Port max**: `3389`
    * **Source type**: CIDR block `10.<TEAM_ID_NUMBER>.1.0/24`
    * **Destination type**: IP address `10.<TEAM_ID_NUMBER>.1.4`
 
 7. In **Outbound rules**, click **Create**:
 
-   * **Protocol**: TCP
-   * **Port**: Any
-   * **Source type**: Any
-   * **Destination type**: Any
+   * **Protocol**: `ICMP-TCP-UDP`
+   * **Port**: `Any`
+   * **Source type**: `Any`
+   * **Destination type**: `Any`
 
 8. Click **Create**.
 9. Click **Create Security group**
@@ -458,8 +444,6 @@ ibmcloud is security-group-create \
 --resource-group-name <TEAM_NAME>-management-rg
 ```
 
-2. Capture the ID of the created security group for use in the next step
-
 ### Step 3: Create a Security Group Rules in the CLI
 
 1. In a terminal session, add an inbound rule:
@@ -471,7 +455,7 @@ inbound \
 udp \
 --vpc <TEAM_NAME>-management-vpc \
 --local 0.0.0.0/0 \
---remote 0.0.0.0/0
+--remote 0.0.0.0/0 \
 --port-min 443 \
 --port-max 443
 ```
@@ -486,17 +470,19 @@ all \
 --remote 0.0.0.0/0
 ```
 
-3. Repeat for a the VPE security group:
+3. Repeat to create the security group and rules for the VPE security group:
 
    * **Security group name**: <TEAM_NAME>-vpe-sg
    * **Inbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
    * **Outbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
 
-4. Repeat for a the NFS security group:
+4. Repeat to create the security group and rules for a the NFS security group:
 
    * **Security group name**: <TEAM_NAME>-nfs-sg
    * **Inbound rule**: TCP 2049, any, any
    * **Outbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
+
+5. In the UI check all security groups and their rules and correct as needed
 
 ## Create ACL
 
@@ -534,18 +520,24 @@ For production environments, consider creating more restrictive rules that only 
    # Add inbound rule to allow all traffic
    ibmcloud is network-acl-rule-add \
    <TEAM_NAME>-mgmt-acl \
-   --direction inbound \
-   --action allow \
-   --protocol all \
-   --source 0.0.0.0/0
+   allow \
+   inbound \
+   all \
+   0.0.0.0/0 \
+   0.0.0.0/0 \
+   --vpc <TEAM_NAME>-management-vpc \
+   --name default-inbound-rule
 
    # Add outbound rule to allow all traffic  
    ibmcloud is network-acl-rule-add \
    <TEAM_NAME>-mgmt-acl \
-   --direction outbound \
-   --action allow \
-   --protocol all \
-   --destination 0.0.0.0/0
+   allow \
+   outbound \
+   all \
+   0.0.0.0/0 \
+   0.0.0.0/0 \
+   --vpc <TEAM_NAME>-management-vpc \
+   --name default-outbound-rule
    ```
 
 ## Create DNS Custom Resolvers
