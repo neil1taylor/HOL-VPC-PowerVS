@@ -706,9 +706,9 @@ ibmcloud is instance-create \
 us-south-1 \
 bx2-2x8 \
 <TEAM_NAME>-mgmt-sn \
+--pnac-vni <TEAM_NAME>-mgmt-02-vni \
 --image ibm-windows-server-2022-full-standard-amd64-25 \
 --keys <TEAM_NAME>-ssh-key-1 \
---sgs <TEAM_NAME>-mgmt-sg \
 --resource-group-name <TEAM_NAME>-management-rg \
 --user-data @<FULL_PATH>/mgmt-02-vsi.ps1
 ```
