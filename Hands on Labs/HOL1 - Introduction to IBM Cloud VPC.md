@@ -540,6 +540,8 @@ For production environments, consider creating more restrictive rules that only 
    --name default-outbound-rule
    ```
 
+2. Using the UI check everything is expected, if not fix via the UI.
+
 ## Create DNS Custom Resolvers
 
 ### Step1: Create DNS Custom Resolvers
@@ -548,26 +550,33 @@ For production environments, consider creating more restrictive rules that only 
 
    ```bash
    # Install the plugin
-   ibmcloud plugin install dns-svcs
+   ibmcloud plugin install dns
 
    # Target the resource group
    ibmcloud target -g <TEAM_NAME>-services-rg
 
    # Get the ID from the name
    INSTANCE_ID=$(ibmcloud dns instances --output json | jq -r '.[] | select(.name=="<TEAM_NAME>-dns-srv") | .id')
+   echo $INSTANCE_ID
    ibmcloud dns instance-target $INSTANCE_ID
 
    # Get the subnet CRN
-   SUBNET_CRN=$(ibmcloud is subnets --output json | jq -r '.[] | select(.name=="<TEAM_NAME>-vpn-sn") | .crn')
+   SUBNET_CRN=$(ibmcloud is subnets --resource-group-name <TEAM_NAME>-management-rg --output json | jq -r '.[] | select(.name=="<TEAM_NAME>-vpe-sn") | .crn')
+   echo $SUBNET_CRN
 
    # Create the first resolver
    ibmcloud dns custom-resolver-create \
    --name "<TEAM_NAME>-custom-resolver-1" \
    --description "First custom resolver in VPC subnet" \
-   --location $SUBNET_CRN, $SUBNET_CRN
+   --location $SUBNET_CRN \
+   --location $SUBNET_CRN
 
    # Get the resolver ID
    RESOLVER_ID=$(ibmcloud dns custom-resolvers --output json | jq -r '.[].id' )
+   echo $RESOLVER_ID
+
+   # Enable the resolver
+   ibmcloud dns custom-resolver-update $RESOLVER_ID --enabled true
 
    # Get the IP addresses of the resolvers
    ibmcloud dns custom-resolver \
@@ -600,46 +609,54 @@ To create a virtual network interface in the console, follow these steps:
   
 4. In the Details section:
 
-   * **Name**: `<TEAM_NAME>mgmt-01-vni`.
+   * **Name**: `<TEAM_NAME>-mgmt-01-vni`.
    * **Resource group**: `<TEAM_NAME>-management-rg`.
    * **Tags**: `env:mgmt`.
 
 5. In the Network configuration section, complete the following information:
 
    * **Virtual private cloud**: `<TEAM_NAME>-management-vpc`.
-   * **Subnet**: `<TEAM_NAME>mgmt-sn`.
+   * **Subnet**: `<TEAM_NAME>-mgmt-sn`.
    * **Allow IP spoofing**: Disabled.
    * **Infrastructure NAT**: Enabled.
    * **Protocol state filtering mode**: Auto.
 
-6. In the Security groups section, select `<TEAM_NAME>mgmt-sg`.
-7. In the Primary IP section:
+6. In the Primary IP section:
    
-   * **Reserving method**: `<TEAM_NAME>mgmt-01-rip`.
+   * **Reserving method**: `Let me specify` and then select `<TEAM_NAME>-mgmt-01-rip`.
    * **Auto release**: Disabled.
 
-8. In the Floating IPs section, click **Attach**. In the side panel, select: `<TEAM_NAME>mgmt-fip`.
-9. Review the information in the Summary panel, and click **Create virtual network interface**.
+7. In the Floating IPs section, click **Attach**. In the side panel, create a new floating IP with:
 
-### Step 2: Create other VNI in the UI
+   * **Name**: `<TEAM_NAME>-mgmt-fip`.
+   * **Resource group**: `<TEAM_NAME>-management-rg`.
+   * **Tags**: `env:mgmt`
+
+8.  In the Security groups section, select `<TEAM_NAME>-mgmt-sg`.
+9.  Review the information in the Summary panel, and click **Create virtual network interface**.
+
+### Step 2: Create VNI in the CLI
 
 For the next VNI we will use the CLI:
 
-1. Using the CLI
+1. Using the CLI:
 
 ```bash
+rip_id=$(ibmcloud is subnet-reserved-ip team1-mgmt-sn team1-mgmt-02-rip --output json | jq -r '.id')
+echo $rip_id
+
 ibmcloud is virtual-network-interface-create \
---name <TEAM_NAME>mgmt-02-vni \
+--name <TEAM_NAME>-mgmt-02-vni \
 --allow-ip-spoofing false \
 --auto-delete false \
 --enable-infrastructure-nat true \
 --protocol-state-filtering-mode auto \
---rip-name <TEAM_NAME>mgmt-02-rip \
---subnet <TEAM_NAME>mgmt-sn \
---sgs <TEAM_NAME>mgmt-sg \
+--rip $rip_id \
+--sgs <TEAM_NAME>-mgmt-sg \
 --resource-group-name <TEAM_NAME>-management-rg \
 --vpc <TEAM_NAME>-management-vpc 
 ```
+
 #### Notes
 
 1. Disabling IP spoofing allows traffic to pass through the network interface, instead of ending at the network interface.
@@ -668,18 +685,19 @@ To create a virtual server instance in the console, follow these steps:
 5. Click on **Change profile**
 6. Select **By Scenario** and then select **Web Development and Test**.
 7. Click on **bx2-2x8** and then click **Save**.
-8. In **SSH keys** select **<TEAM_NAME>-ssh-key-1** and **<TEAM_NAME>-ssh-key-1**.
+8. In **SSH keys** select **<TEAM_NAME>-ssh-key-1** and **<TEAM_NAME>-ssh-key-2**.
 9. In **VPC** select **<TEAM_NAME>-management-vpc**.
-10. In **Network attachments with Virtual network interface**, click on the pencil icon (**Edit**)
-11. In **Advanced options**, select **User data** and paste in the yaml from [mgmt-01-vsi.yaml](Scripts/HOL1/Linux/mgmt-01-vsi.yaml).
-
-Click **Create virtual server**
+10. In **Network attachments with Virtual network interface**, delete the attachment.
+11. Select **Actions / Attach existing**, then select `<TEAM_NAME>-mgmt-01-vni`. Then click **Next** and **Create**
+12. In **Advanced options**, select **User data** and paste in the yaml from [mgmt-01-vsi.yaml](Scripts/HOL1/Linux/mgmt-01-vsi.yaml).
+13. Click **Create virtual server**
 
 ### Step 2: Create a VSI in the CLI
 
 Now we will create a VSI using the CLI.
 
-1. In a terminal session:
+1. Find the path of the `mgmt-02-vsi.ps1` file e.g. `/Users/neiltaylor/Documents/GitHub/HOL-VPC-PowerVS/Scripts/HOL1/Windows/mgmt-02-vsi.ps1`
+2. In a terminal session:
 
 ```bash
 ibmcloud is instance-create \
@@ -687,12 +705,12 @@ ibmcloud is instance-create \
 <TEAM_NAME>-management-vpc \
 us-south-1 \
 bx2-2x8 \
-<TEAM_NAME>mgmt-sn \
---image-name ibm-windows-server-2022-full-standard-amd64-25 \
---key-names <TEAM_NAME>-ssh-key-1 \
+<TEAM_NAME>-mgmt-sn \
+--image ibm-windows-server-2022-full-standard-amd64-25 \
+--keys <TEAM_NAME>-ssh-key-1 \
 --sgs <TEAM_NAME>-mgmt-sg \
 --resource-group-name <TEAM_NAME>-management-rg \
---userdata @mgmt-02-vsi.yaml
+--user-data @<FULL_PATH>/mgmt-02-vsi.ps1
 ```
 
 2. Use the following to add a tag to the VSI:
