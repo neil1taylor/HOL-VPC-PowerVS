@@ -48,7 +48,21 @@ Workload Protection instance | <TEAM_NAME>-scc-wp-svc
 
 In this HOL we will:
 
-* Step 1: Provisioning a Workload Protection instance
+* Provision the service and deploy agents:
+    * Step 1: Provisioning a Workload Protection instance
+    * Step 2: Install a Workload Protection Agent for Linux
+* Verify the Agent Connection and Status:
+    * Step 1: Verify the configuration
+    * Step 2: Verify Agent Status
+    * Step 3: Verifying results in the UI
+* Explore the UI:
+    * Step 1: Compliance
+    * Step 2: Vulnerability Management (Host Scanning)
+    * Step 3: Threat Detection and Response (Server EDR)
+    * Step 4: Create a preemptive blocking policy
+    * Step 5: Review the DORA policy
+
+## Provision the service and deploy agents
 
 ### Step 1: Provisioning a Workload Protection instance
 
@@ -71,7 +85,7 @@ We have disabled **Cloud Security Posture Management** in this hands on lab so t
 4. Using the commandline noted earlier install the Agent
 
 
-## Verify the Agent Connection
+## Verify the Agent Connection and Status
 
 ### Step 1: Verify the configuration
 
@@ -94,7 +108,9 @@ After a few minutes, you can check the results in the UI for your **Vulnerabilit
 5. Verify your agent is connected correctly under **Integrations / Data Sources / Sysdig Agents**.
 6. Check that your host appears under Inventory. You can filter by the hostname (Resource Name) or type of operating system (Platform).
 
-### Step 4: Compliance
+## Explore the UI
+
+### Step 1: Compliance
 
 In the UI and documentation Compliances is also known as **Posture Management**. Workload Protection automates compliance checks against various industry standards and best practices, including the CIS Linux Benchmark. It identifies misconfigurations and violations and suggests remediation. An understanding of the following terminology will be useful:
 
@@ -119,7 +135,7 @@ Compliance results will be shown within a few minutes of installation and scans 
 12. In an SSH session to the Ubuntu Management VSI use the command `curl -sSL https://raw.githubusercontent.com/neil1taylor/HOL-VPC-PowerVS/refs/heads/main/Scripts/HOL8/cis-hardening.sh | sudo bash` to download and run the hardening script.
 13. You will not be able to see the results of the hardening until the compliance scan is re-run. This can be triggered via the API, but we will wait until the next day to see the changes
 
-### Step 5: Vulnerability Management (Host Scanning)
+### Step 2: Vulnerability Management (Host Scanning)
 
 The Workload Protection agent scans host packages to detect associated vulnerabilities and prioritizes them based on severity and the availability of fixed versions. Workload Protection streamlines vulnerability prioritization, enabling more efficient patching efforts by focusing on real-world exposure. You can expect the results of a scan to be visible in the UI within 15 minutes max. Scans are refreshed every 12 hours.
 
@@ -127,7 +143,7 @@ The Workload Protection agent scans host packages to detect associated vulnerabi
 2. In the **Asset** section select the management VSI.
 3. Select a package and explore the detailed information available.
 
-### Step 6: Threat Detection and Response (Server EDR)
+### Step 3: Threat Detection and Response (Server EDR)
 
 Workload Protection instruments Linux hosts via eBPF to inspect all system activity through system calls with minimal performance impact. It uses thousands of out-of-the-box policies, updated weekly by the Sysdig Threat Research team, and supports custom rules using Falco language. It can also detect malware and perform behavioral analysis.
 
@@ -144,7 +160,7 @@ In this demo scenario we will simulate an attack.
 9. Navigate to **Threats / Investigate / Activity Audit**.
 10. Review the list and find the data source `cmd` for the `touch` command. Click the entry and review the details
 
-### Step 7: Create a premptive blocking policy
+### Step 4: Create a preemptive blocking policy
 
 When a policy for preemptive blocking is configured, attempts to execute a blacklisted binary will be blocked by killing the process. In this step we will:
 
@@ -182,7 +198,7 @@ If you still have time in the hands on lab:
 * Repeat the steps but use the Windows Management server.
 * Configure Zones and add policies to these zones.
 
-### Step 8: Review the DORA policy
+### Step 5: Review the DORA policy
 
 1. In the Workload Protection UI, navigate to **Policies / Posture / Policies**.
 2. In the Search bar enter `DORA`.
@@ -198,9 +214,9 @@ If you still have time in the hands on lab:
 
 1. What is the primary purpose of IBM Cloud Security and Compliance Center Workload Protection?
     A. To manage billing and invoicing for cloud resources.
-    B. To find and prioritise software vulnerabilities, detect and respond to threats, and manage configurations, permissions, and compliance from source to run.
+    B. To find and prioritize software vulnerabilities, detect and respond to threats, and manage configurations, permissions, and compliance from source to run.
     C. To provide general cloud infrastructure monitoring.
-    D. To solely focus on network performance optimisation. 
+    D. To solely focus on network performance optimization. 
 2. Which of the following capabilities are supported by the data collected by the IBM Cloud Security and Compliance Center Workload Protection agent?
     A. Only intrusion detection and incident response.
     B. Intrusion detection, posture management, vulnerability scanning, and incident response capabilities.
