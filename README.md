@@ -121,10 +121,11 @@ What you will learn:
 
 What you will learn:
 
-* Deploying and configuring IBM Cloud Monitoring with Sysdig.
-* Setting up IBM Cloud Logs and integrating with VPC/PowerVS workloads.
-* Custom metrics collection from virtual server instances.
-* Building dashboards, setting alerts, and automated incident response.
+* Configure IBM Cloud Observability services in an IBM Cloud account 
+* Core features in IBM Cloud Logs and IBM Cloud Monitoring 
+* Monitoring IBM Cloud VPC using IBM Cloud Logs and IBM Cloud Monitoring
+* Building views and dashboards, configuring alerts for automated incident response.
+* Configuring PowerVS to send logs to IBM Cloud Logs and metrics to IBM Cloud Monitoring
 * Integrating third-party observability tools with IBM Cloud.
 
 ### Hands-on Lab 7: Automation and Infrastructure as Code (60 mins)

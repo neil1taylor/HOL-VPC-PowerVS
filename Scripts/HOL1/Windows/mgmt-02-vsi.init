@@ -1,0 +1,28 @@
+Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
+MIME-Version: 1.0
+
+--MIMEBOUNDARY
+Content-Transfer-Encoding: 7bit
+Content-Type: text/cloud-config
+MIME-Version: 1.0
+
+#cloud-config
+set_timezone: US/Eastern
+
+--MIMEBOUNDARY
+Content-Disposition: attachment; filename="initial.ps1"
+Content-Transfer-Encoding: 7bit
+Content-Type: text/x-shellscript
+MIME-Version: 1.0
+
+#ps1_sysnative
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choco install firefox -y --no-progress --force
+choco install winscp -y --no-progress --force
+choco install putty -y --no-progress --force
+choco install vscode -y --no-progress --force
+choco install git -y --no-progress --force
+choco install curl -y --no-progress --force
+choco install jq -y --no-progress --force
+
+--MIMEBOUNDARY

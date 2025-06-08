@@ -39,7 +39,7 @@ runcmd:
   - chown -R ubuntu:ubuntu /home/ubuntu
   
   # Log installation completion
-  - echo "$(date): IBM Cloud CLI and tools installation completed" >> /var/log/userdata.log
+  - 'echo "$(date): IBM Cloud CLI and tools installation completed" >> /var/log/userdata.log'
   
   # Display installed version (this will appear in cloud-init logs)
   - /usr/local/bin/ibmcloud version

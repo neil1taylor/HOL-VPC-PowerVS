@@ -137,11 +137,11 @@ On the first participants laptop, we will upload the first key to IBM Cloud usin
 1. In IBM Cloud console, go to **Navigation menu / Infrastructure VPC icon / Compute / SSH keys**.
 2. Click **Create** and enter the following information:
 
-   * **Geography**: North America
-   * **Region**: Dallas (us-south)
-   * **Name**: <TEAM_NAME>-ssh-key-1
-   * **Resource group**: <TEAM_NAME>-management-rg
-   * **Tags**: env:mgmt
+   * **Geography**: `North America`
+   * **Region**: `Dallas (us-south)`
+   * **Name**: `<TEAM_NAME>-ssh-key-1`
+   * **Resource group**: `<TEAM_NAME>-management-rg`
+   * **Tags**: `env:mgmt`
 
 3. Select **Provide existing public key**.
 4. Click **Upload public key**.
@@ -228,9 +228,9 @@ We will learn how to create a DNS instance. IBM Cloud DNS Services provide priva
 1. Open the IBM Cloud catalog page and in teh Search box type **DNS** and then select **DNS Services**.
 2. In the **Create** tab:
  
-   * **Service name**: <TEAM_NAME>-dns-srv 
-   * **Resource group**: <TEAM_NAME>-services-rg
-   * **Tags**: env:services
+   * **Service name**: `<TEAM_NAME>-dns-srv`
+   * **Resource group**: `<TEAM_NAME>-services-rg`
+   * **Tags**: `env:services`
  
 3. Check the **I have read and agree to the following license agreements** box.
 4. Click **Create**.
@@ -251,8 +251,8 @@ We will learn how to create a DNS instance. IBM Cloud DNS Services provide priva
 2. Click **Add network**.
 3. Select:
  
-   * **Region**: Dallas
-   * **Network**: <TEAM_NAME>-management-vpc
+   * **Region**: `Dallas`
+   * **Network**: `<TEAM_NAME>-management-vpc`
 
 4. Click **Add network**.
 
@@ -263,21 +263,21 @@ We will learn how to create a DNS instance. IBM Cloud DNS Services provide priva
 3. Select **type of record** `A`.
 4. Enter:
  
-   * **Name**: <TEAM_NAME>-mgmt-01-vsi
-   * **IPv4 Address**: 10.<TEAM_NUMBER>.1.4
+   * **Name**: `<TEAM_NAME>-mgmt-01-vsi`
+   * **IPv4 Address**: `10.<TEAM_NUMBER>.1.4`
 
 5. Click **Save**
 6. Repeat for:
  
-   * **Name**: <TEAM_NAME>-mgmt-02-vsi
-   * **IPv4 Address**: 10.<TEAM_NUMBER>.1.5
+   * **Name**: `<TEAM_NAME>-mgmt-02-vsi`
+   * **IPv4 Address**: `10.<TEAM_NUMBER>.1.5`
 
 ### Step 5: Add DNS resource PTR records
 
 1. Click **Add Record** to display a panel where you create the record.
 2. Select **type of record** `PTR`.
-3. Select **existing record**: <TEAM_NAME>-mgmt-01-vsi
-4. Repeat for <TEAM_NAME>-mgmt-02-vsi
+3. Select **existing record**: `<TEAM_NAME>-mgmt-01-vsi`
+4. Repeat for` <TEAM_NAME>-mgmt-02-vsi`
 
 ## Create a public gateway
 
@@ -330,8 +330,8 @@ We will create two subnets using the UI.
    - **Tags**: `env:mgmt`.
    - **Virtual private cloud**: `<TEAM_NAME>-management-vpc`.
    - **IP range selection**: `10.<TEAM_ID_NUMBER>.0.0/24`.
-   - **Routing table**: <TEAM_NAME>-mgmt-rt
-   - **Subnet access control list**: <TEAM_NAME>-mgmt-sg
+   - **Routing table**: `<TEAM_NAME>-mgmt-rt`
+   - **Subnet access control list**: `<TEAM_NAME>-mgmt-sg`
    - **Public gateway**: `Attached`.
 
 5. Click **Create subnet** to create the subnet.
@@ -400,17 +400,17 @@ ibmcloud is subnet-reserved-ip-create \
 2. Click **Create** on the security groups list table.
 3. Configure as follows:
 
-   * **Geography**: North America.
-   * **Region**: us-south
-   * **Name**: <TEAM_NAME>-mgmt-sg.
-   * **Resource group**: <TEAM_NAME>-management-rg.
-   * **Tags**: env:mgmt
+   * **Geography**: `North America`.
+   * **Region**: `us-south`
+   * **Name**: `<TEAM_NAME>-mgmt-sg`.
+   * **Resource group**: `<TEAM_NAME>-management-rg`.
+   * **Tags**: `env:mgmt`
 
 4. In **Inbound rules**, click **Create**:
 
-   * **Protocol**: TCP
-   * **Port min**: 22
-   * **Port max**: 22
+   * **Protocol**: `TCP`
+   * **Port min**: `22`
+   * **Port max**: `22`
    * **Source type**: CIDR block `0.0.0.0/0`
    * **Destination type**: IP address `10.<TEAM_ID_NUMBER>.1.4`
 
@@ -420,8 +420,8 @@ ibmcloud is subnet-reserved-ip-create \
    * **Protocol**: `TCP`
    * **Port min**: `3389`
    * **Port max**: `3389`
-   * **Source type**: CIDR block `10.<TEAM_ID_NUMBER>.1.0/24`
-   * **Destination type**: IP address `10.<TEAM_ID_NUMBER>.1.4`
+   * **Source type**: CIDR block `10.<TEAM_ID_NUMBER>.0.0/24`
+   * **Destination type**: IP address `10.<TEAM_ID_NUMBER>.1.5`
 
 7. In **Outbound rules**, click **Create**:
 
@@ -472,13 +472,13 @@ all \
 
 3. Repeat to create the security group and rules for the VPE security group:
 
-   * **Security group name**: <TEAM_NAME>-vpe-sg
+   * **Security group name**: `<TEAM_NAME>-vpe-sg`
    * **Inbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
    * **Outbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
 
 4. Repeat to create the security group and rules for a the NFS security group:
 
-   * **Security group name**: <TEAM_NAME>-nfs-sg
+   * **Security group name**: `<TEAM_NAME>-nfs-sg`
    * **Inbound rule**: TCP 2049, any, any
    * **Outbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
 
@@ -617,9 +617,9 @@ To create a virtual network interface in the console, follow these steps:
 
    * **Virtual private cloud**: `<TEAM_NAME>-management-vpc`.
    * **Subnet**: `<TEAM_NAME>-mgmt-sn`.
-   * **Allow IP spoofing**: Disabled.
-   * **Infrastructure NAT**: Enabled.
-   * **Protocol state filtering mode**: Auto.
+   * **Allow IP spoofing**: `Disabled`.
+   * **Infrastructure NAT**: `Enabled`.
+   * **Protocol state filtering mode**: `Auto`.
 
 6. In the Primary IP section:
    
@@ -673,11 +673,11 @@ To create a virtual server instance in the console, follow these steps:
 1. In the IBM Cloud console, navigate to **Compute > Virtual server instances**.
 2. Click **Create** the enter the following information:
 
-   * **Gepgraphy**: North America
-   * **Region**: us-south
-   * **Zone**: us-south-1
-   * **Name**: <TEAM_NAME>-mgmt-01-vsi
-   * **Resource group**: <TEAM_NAME>-management-rg.
+   * **Gepgraphy**: `North America`
+   * **Region**: `us-south`
+   * **Zone**: `us-south-1`
+   * **Name**: `<TEAM_NAME>-mgmt-01-vsi`
+   * **Resource group**: `<TEAM_NAME>-management-rg`.
    * **Tags**: `env:mgmt` and `backup:yes`
 
 3. Click on **Change image**
@@ -696,7 +696,7 @@ To create a virtual server instance in the console, follow these steps:
 
 Now we will create a VSI using the CLI.
 
-1. Find the path of the `mgmt-02-vsi.ps1` file e.g. `/Users/neiltaylor/Documents/GitHub/HOL-VPC-PowerVS/Scripts/HOL1/Windows/mgmt-02-vsi.ps1`
+1. Find the path of the `mgmt-02-vsi.ps1` file e.g. `/Users/neiltaylor/Documents/GitHub/HOL-VPC-PowerVS/Scripts/HOL1/Windows/mgmt-02-vsi.init`
 2. In a terminal session:
 
 ```bash
@@ -710,7 +710,7 @@ bx2-2x8 \
 --image ibm-windows-server-2022-full-standard-amd64-25 \
 --keys <TEAM_NAME>-ssh-key-1 \
 --resource-group-name <TEAM_NAME>-management-rg \
---user-data @<FULL_PATH>/mgmt-02-vsi.ps1
+--user-data @<FULL_PATH>/mgmt-02-vsi.init
 ```
 
 2. Use the following to add a tag to the VSI:
