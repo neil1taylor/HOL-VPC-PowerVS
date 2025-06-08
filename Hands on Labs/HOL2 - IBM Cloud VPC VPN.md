@@ -418,6 +418,8 @@ After you create the VPN server using the newly created certificate, you can set
     * **Username**: Administrator
     * **Password**: The password noted above
 
+6. Check that the applications have been installed; Firefox, VSCode etc
+
 ## VPC Site-to-site VPN
 
 This guide walks through connecting two IBM Cloud VPCs using a site-to-site VPN connection, enabling secure communication between resources in different VPCs. You will work with a neighboring team to connect your VPCs. It is important that there are no overlapping subnet CIDR blocks used in both VPCs which is why te IP addressing scheme has been designed around 10.<TEAM_NUMBER>.x.x.
@@ -445,7 +447,6 @@ The steps are as follows:
     - **Key Lifetime**: `28800 seconds`
 
 5. Click **Create**.
-
 
 ### Step 2: Create IPSec Policy
 

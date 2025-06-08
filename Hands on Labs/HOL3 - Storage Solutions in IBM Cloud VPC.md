@@ -41,9 +41,10 @@ In this HOL we will:
     * Step 3: Configuring Ubuntu VSI for NFS
 * Create a Cloud Object Storage (COS) instance and bucket.
     * Step 1: Creating a service instance
-    * Step 2: Create a new bucket and associate the key with it
-    * Step 3: Create Service credentials with HMAC
-    * Step 4: Using the rclone client
+    * Step 2: Create a service athorization between Cloud Object Storage and Key protect
+    * Step 3: Create a new bucket and associate the key with it
+    * Step 4: Create Service credentials with HMAC
+    * Step 5: Using the rclone client
 * Take a backup of the Windows and Linux servers.
 
 ## Key Protect
@@ -52,19 +53,19 @@ In this HOL we will:
 
 1. Follow the instructions at [Creating an instance](https://cloud.ibm.com/docs/key-protect?topic=key-protect-provision) to create a Key Protect instance with the following parameters, using the UI or CLI:
 
-    * **Location**: us-south
-    * **Plan**: standard
-    * **Service name**: <TEAM_NAME>-kms-svc
-    * **Resource group**: <TEAM_NAME>-services-rg
-    * **Tags**: `env:mgmt`
-    * **Allowed network policy**: Private
+    * **Location**: `Dallas (us-south)`
+    * **Plan**: `standard`
+    * **Service name**: `<TEAM_NAME>-kms-svc`
+    * **Resource group**: `<TEAM_NAME>-services-rg`
+    * **Tags**: `env:services`
+    * **Allowed network policy**: `Public and private`
 
 ### Step 2: Generate a customer root key (CRK) for encryption
 
 1. Follow the instructions at [Creating root keys](https://cloud.ibm.com/docs/key-protect?topic=key-protect-create-root-keys&interface=ui) to create a root key with the following parameters using the UI:
 
-    * **Type**:  Root key
-    * **Key name**: <TEAM_NAME>-root-key
+    * **Type**: `Root key`
+    * **Key name**: `<TEAM_NAME>-root-key`
 
 ### Step 3: Configure IAM service-to-service authorization between VPC Infrastructure and Key Protect
 
@@ -76,17 +77,18 @@ In this HOL we will:
 
 1. Follow the instructions at [Creating Block Storage volumes with customer-managed encryption](https://cloud.ibm.com/docs/vpc?topic=vpc-block-storage-vpc-encryption&interface=ui) with the following parameters, using the UI or CLI. Only follow the instructions in the section **Creating data volumes with customer-managed encryption in the console** or **Creating data volumes with customer-managed encryption from the CLI**
 
-    * **Geography**: North America
-    * **Region**: us-south
-    * **Zone**: us-south-1
-    * **Resource group**: <TEAM_NAME>-management-rg
-    * **Tags**: env:mgmt, backup:yes
-    * **Attach to existing server**: <TEAM_NAME>-mgmt-02-vsi
-    * **IOPS Tiers**: 3 IOPS/GB
-    * **Storage size (GB)**: 100
-    * **Encryption at rest**: Key protect
-    * **Data encryption instance**: <TEAM_NAME>-kms-svc
-    * **Data encryption key**: <TEAM_NAME>-root-key 
+    * **Geography**: `North America`
+    * **Region**: `Dallas (us-south)`
+    * **Zone**: `us-south-1`
+    * **Name**: `<TEAM_NAME>-data-01-block`
+    * **Resource group**: `<TEAM_NAME>-management-rg`
+    * **Tags**: `env:mgmt`, `backup:yes`
+    * **Attach to existing server**: `<TEAM_NAME>-mgmt-02-vsi`
+    * **IOPS Tiers**: `3 IOPS/GB`
+    * **Storage size (GB)**: `50`
+    * **Encryption at rest**: `Key protect`
+    * **Data encryption instance**: `<TEAM_NAME>-kms-svc`
+    * **Data encryption key**: `<TEAM_NAME>-root-key`
 
 ### Step2: Attach Block Storage to Windows VSI
 
@@ -101,7 +103,7 @@ Next we need to format and mount the new disk within the Windows operating syste
 * Create partitions and format with desired file system
 * Assign drive letter and configure as needed
 
-1. Follow the instructions at [Setting up your Block Storage for VPC data volume for use (Windows)](https://cloud.ibm.com/docs/vpc?topic=vpc-start-using-your-block-storage-data-volume-win)
+1. Follow the instructions at [Setting up your volume for use with Windows PowerShell](https://cloud.ibm.com/docs/vpc?topic=vpc-start-using-your-block-storage-data-volume-win#winpowershell)
 
 ## Create an NFS share and access it from the Linux management server
 
@@ -114,7 +116,7 @@ Follow the instructions at [Establishing service-to-service authorizations for F
 1. Follow the instructions at [Creating File Shares](https://cloud.ibm.com/docs/vpc?topic=vpc-file-storage-create) using the following parameters:
 
    * **Geography**: `North America`
-   * **Region**: `us-south`
+   * **Region**: `Dallas (us-south)`
    * **Zone**: `us-south-1`
    * **Name**: <TEAM_NAME>-nfs-01
    * **Tags**: `env:mgmt`
@@ -124,14 +126,15 @@ Follow the instructions at [Establishing service-to-service authorizations for F
    * **IOPS**: `100`
    * **Mount target access mode**: `Security Group`
    * **Allowed transit encryption modes**: `none`
-   * **Mount target name**: <TEAM_NAME>-nfs-mnt-01
-   * **VPC**: <TEAM_NAME>-management-vpc 
-   * **Virtual network interface name**: <TEAM_NAME>-nfs-mnt-01-vni
-   * **Subnet**: <TEAM_NAME>-mgmt-sn
-   * **Security groups**: <TEAM_NAME>-nfs-sg
-   * **Encryption at rest**: Key protect
-   * **Data encryption instance**: <TEAM_NAME>-kms-svc
-   * **Data encryption key**: <TEAM_NAME>-root-key 
+   * **Mount target name**: `<TEAM_NAME>-nfs-mnt-01`
+   * **VPC**: `<TEAM_NAME>-management-vpc`
+   * **Virtual network interface name**: `<TEAM_NAME>-nfs-mnt-01-vni`
+   * **Subnet**: `<TEAM_NAME>-mgmt-sn`
+   * **Security groups**: `<TEAM_NAME>-nfs-sg`
+   * **Reserving method**: `Create one for me`
+   * **Encryption at rest**: `Key protect`
+   * **Data encryption instance**: `<TEAM_NAME>-kms-svc`
+   * **Data encryption key**: `<TEAM_NAME>-root-key`
 
 ### Step 3: Configuring Ubuntu VSI for NFS
 
@@ -145,38 +148,46 @@ Follow the instructions at [Establishing service-to-service authorizations for F
 2. In the left menu, click the **Storage** category. Click the **Object Storage** tile.
 3. On the order page:
    
-   * **Plan**: Standard
-   * **Service name**: <TEAM_NAME>-object-svc 
-   * **Resource group**: <TEAM_NAME>-services-rg 
+   * **Plan**: `Standard`
+   * **Service name**: `<TEAM_NAME>-object-svc`
+   * **Resource group**: `<TEAM_NAME>-services-rg` 
    * **Tags**: `env:mgmt`
 
 4. Click **Create**.
 
-### Step 2: Create a new bucket and associate the key with it
+### Step 2: Create a service athorization between Cloud Object Storage and Key protect
+
+1. Follow the instructions at [Integrating a supported service](https://cloud.ibm.com/docs/key-protect?topic=key-protect-integrate-services#grant-access)
+
+### Step 3: Create a new bucket and associate the key with it
 
 1. Click your Storage instance.
-2. Click Create bucket.
-3. Click Create in the Create a Custom Bucket pane.
-4. Enter a unique bucket name: <TEAM_NAME>-bucket-01
-5. Select Resiliency>Regional.
+2. Click **Create bucket**.
+3. Click **Create** in the Create a Custom Bucket pane.
+4. Enter a unique bucket name: `<TEAM_NAME>-bucket-01`
+5. Select **Resiliency** `Regional`.
 6. Select a Location: `us-south`
 7. Select a Storage Class: `Smart`
-8. Enable Service integrations>Encryption>Key management.
-9. Click Key Protect>Use existing instance.
+8. Enable **Service integrations > Encryption > Key management**.
+9. Click **Key Protect > Use existing instance**.
 10. Select the Search by instance tab in the Key Protect integration side panel.
-11. Select the Key Protect instance from the menu: <TEAM_NAME>-kms-svc
+11. Select the Key Protect instance from the menu:` <TEAM_NAME>-kms-svc`
 12. Select the Key name: <TEAM_NAME>-root-key
 13. Click the Associate key button.
 14. Click the Create bucket button. A popup message displays that a bucket was created successfully.
 15. Confirm by clicking the Configuration tab.
 
-### Step 3: Create Service credentials with HMAC
+### Step 4: Create Service credentials with HMAC
 
-Follow the instructions at [Service credentials](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-service-credentials)
+Follow the instructions at [Service credentials](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-service-credentials) using the following:
+
+* **Name**: `<TEAM_ID>-object-creds`
+* **Role**: `Manager`
+* **HMAC**: `Enabled`
 
 You will need the `access_key_id` and `secret_access_key` in the next steps.
 
-### Step 4: Using the rclone client
+### Step 5: Using the rclone client
 
 Follow the Linux instructions at [Using rclone](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-rclone) to:
 
