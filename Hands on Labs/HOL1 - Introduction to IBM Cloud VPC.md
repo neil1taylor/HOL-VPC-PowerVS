@@ -126,7 +126,7 @@ On the first participant's laptop, if you are using Linux or MacOS, in a termina
 
 If you are using Windows, in a PowerShell session:
 
-`ssh-keygen -b 4096 -t rsa -f C:\%USERPROFILE%\.ssh/hol-key -q -N '""'`
+`ssh-keygen -b 4096 -t rsa` and press enter to all prompts
 
 On the second participant's laptop, follow step 1 above
 
