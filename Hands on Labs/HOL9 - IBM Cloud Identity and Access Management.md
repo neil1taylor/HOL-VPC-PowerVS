@@ -85,76 +85,62 @@ ibmcloud iam service-api-key-create key1 app-automation
 
 Objectives:
 
-    Monitor IAM activity across interfaces
+* Monitor IAM activity across interfaces
 
 Tasks:
 
-    UI:
+* UI:
 
-        Open Activity Tracker, filter IAM events
-
-    CLI:
-    Activity Tracker currently has limited CLI support—use UI
-
-    REST:
-    Access logs via Activity Tracker API (for advanced users)
+    * Open Activity Tracker, filter IAM events
 
 ✅ Module 6: Trusted Profiles and Identity Federation (25 mins)
 
 Objectives:
 
-    Configure trusted profile for workload identity
-
-    Connect federated IdP (SAML/OIDC)
+* Configure trusted profile for workload identity
+* Connect federated IdP (SAML/OIDC)
 
 Tasks:
 
-    UI:
+* UI:
+    * Create Trusted Profile “K8sAccess”
+    * Add compute resource link
+    * Assign access policies
 
-        Create Trusted Profile “K8sAccess”
-
-        Add compute resource link
-
-        Assign access policies
-
-    CLI:
-
-    ibmcloud iam trusted-profile-create K8sAccess --description "Kubernetes Access Profile"
-    ibmcloud iam trusted-profile-policy-create K8sAccess --roles Viewer --service-name cloud-object-storage
-
-    REST:
-    Use POST /v1/profiles and POST /v1/policies
-    (Federation via PATCH /v1/saml_configuration or oidc_configuration)
+* CLI:
+```
+ibmcloud iam trusted-profile-create K8sAccess --description "Kubernetes Access Profile"
+ibmcloud iam trusted-profile-policy-create K8sAccess --roles Viewer --service-name cloud-object-storage
+```
+* REST:
+    * Use POST /v1/profiles and POST /v1/policies
 
 ✅ Module 7: Advanced IAM Scenarios (15 mins)
 
 Objectives:
 
-    Create conditional, time-based, and scoped policies
-
-    Disable public access group
+* Create conditional, time-based, and scoped policies
+* Disable public access group
 
 Tasks:
 
-    UI:
+* UI:
+    * Create policy valid for 1 hour
+    * Disable "public access group" in IAM settings
 
-        Create policy valid for 1 hour
+* CLI:
 
-        Disable "public access group" in IAM settings
+```
+ibmcloud iam policy-create <subject> --roles Viewer --service-name cloud-object-storage --condition expiration="1h"
+ibmcloud account-settings-update --disable-public-access-group true
+```
 
-    CLI:
-
-    ibmcloud iam policy-create <subject> --roles Viewer --service-name cloud-object-storage --condition expiration="1h"
-    ibmcloud account-settings-update --disable-public-access-group true
-
-    REST:
-    Use POST /v1/policies with conditions
-    Update account settings via PATCH /v1/account_settings
+* REST:
+    * Use POST /v1/policies with conditions
+    * Update account settings via PATCH /v1/account_settings
 
 ✅ Wrap-Up and Q&A (5 mins)
 
-    Recap differences between UI, CLI, and REST API
-
-    Tips for choosing the right interface (automation vs. usability)
-
-    Discuss IAM troubleshooting and best practices
+* Recap differences between UI, CLI, and REST API
+* Tips for choosing the right interface (automation vs. usability)
+* Discuss IAM troubleshooting and best practices
