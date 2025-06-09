@@ -683,7 +683,7 @@ To create a virtual server instance in the console, follow these steps:
    * **Tags**: `env:mgmt` and `backup:yes`
 
 3. Click on **Change image**
-4. Scroll down, select **ibm-ubuntu-24-04-2-minimal-amd64-1** and click **Save**.
+4. Scroll down, select **ibm-ubuntu-24-04-2-minimal-amd64-2** and click **Save**.
 5. Click on **Change profile**
 6. Select **By Scenario** and then select **Web Development and Test**.
 7. Click on **bx2-2x8** and then click **Save**.
