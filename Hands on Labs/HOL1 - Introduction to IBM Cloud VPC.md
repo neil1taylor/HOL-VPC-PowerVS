@@ -166,7 +166,7 @@ Or if using Windows:
 ```ps1
 ibmcloud is key-create \
 <TEAM_NAME>-ssh-key-2 \
-@KEY_FILE C:\%USERPROFILE%\.ssh/hol-key \
+@pub_key_path \
 --resource-group-name <TEAM_NAME>-management-rg
 ```
 
