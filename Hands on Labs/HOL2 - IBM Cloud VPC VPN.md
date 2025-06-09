@@ -98,7 +98,7 @@ The steps are as follows:
 3. In the Create tab:
 
     * **Region**: `Dallas (us-south)`
-    * **Pricing Plan**: `Standard`
+    * **Pricing Plan**: `Free`
     * **Name**: `<TEAM_NAME>-secrets-mgr-svc`
     * **Resource group**: `<TEAM_NAME>-services-rg`
     * **Tags**: `env:mgmt`
