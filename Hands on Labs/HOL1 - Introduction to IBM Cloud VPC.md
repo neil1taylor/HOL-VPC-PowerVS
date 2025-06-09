@@ -691,7 +691,7 @@ To create a virtual server instance in the console, follow these steps:
 9. In **VPC** select **<TEAM_NAME>-management-vpc**.
 10. In **Network attachments with Virtual network interface**, delete the attachment.
 11. Select **Actions / Attach existing**, then select `<TEAM_NAME>-mgmt-01-vni`. Then click **Next** and **Create**
-12. In **Advanced options**, select **User data** and paste in the yaml from [mgmt-01-vsi.yaml](https://github.com/neil1taylor/HOL-VPC-PowerVS/blob/main/Scripts/HOL1/Linux/mgmt-01-vsi.yaml).
+12. In **Advanced options**, select **User data** and paste in the yaml from [mgmt-01-vsi.yaml](https://raw.githubusercontent.com/neil1taylor/HOL-VPC-PowerVS/refs/heads/main/Scripts/HOL1/Linux/mgmt-01-vsi.yaml).
 14. Click **Create virtual server**
 
 ### Step 2: Create a VSI in the CLI
