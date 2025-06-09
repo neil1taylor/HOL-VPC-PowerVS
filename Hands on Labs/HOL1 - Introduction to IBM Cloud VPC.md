@@ -155,6 +155,7 @@ On the second participants laptop, we will upload the second key to IBM Cloud us
 If using Linux or MacOS:
 
 ```bash
+ibmcloud target -r us-south
 ibmcloud is key-create \
 <TEAM_NAME>-ssh-key-2 \
 @~/.ssh/hol-key.pub \
@@ -164,6 +165,7 @@ ibmcloud is key-create \
 Or if using Windows:
 
 ```ps1
+ibmcloud target -r us-south
 ibmcloud is key-create \
 <TEAM_NAME>-ssh-key-2 \
 @pub_key_path \
