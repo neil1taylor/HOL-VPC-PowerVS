@@ -147,15 +147,16 @@ What you will learn:
 * Policy creation: vulnerability management, compliance enforcement, and threat detection.
 * Real-time security event monitoring and automated response workflows.
 
-### Hands-on Lab 9: IBM Cloud Identity and Access Management (IAM) for VPC and PowerVS (120 mins)
+### Hands-on Lab 9: IBM Cloud Identity and Access Management (IAM) (120 mins)
 
 What you will learn:
 
-* Configure and manage IBM Cloud IAM access policies.
-* Implement role-based access control for users and service accounts.
-* Leveraging service IDs and API keys.
-* Using trusted profiles and context based restrictions.
-* Monitor and audit IAM activities using Cloud Activity Tracker.
+* Configure IBM Cloud IAM settings using UI, CLI, and REST APIs
+* Manage users, access groups, roles, and policies through all interfaces
+* Create service identities, generate API keys, and configure automation access
+* Monitor IAM activities via Activity Tracker
+* Set up federated identity and trusted profiles for workload access
+* Simulate IAM security scenarios using multiple access paths
 
 ### Hands-on Lab 10: IBM Cloud for SAP Specialty (300 mins)
 
