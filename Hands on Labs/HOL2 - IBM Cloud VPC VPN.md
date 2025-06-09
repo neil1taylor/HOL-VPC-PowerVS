@@ -287,7 +287,7 @@ For the VPN service to get the certificates from Secrets Manager, an authorizati
 2. Click "Create".
 3. In the dialogue boxes create an authorization with the following characteristics:
    
-   * **Source**: `VPC Infrastructure Services` with ResourceType equals `vpn-server`
+   * **Source**: `VPC Infrastructure Services` with ResourceType equals `Client VPN for VPC`
    * **Target**: `Secrets Manager service`
    * **Role**: `SecretsReader`
 
