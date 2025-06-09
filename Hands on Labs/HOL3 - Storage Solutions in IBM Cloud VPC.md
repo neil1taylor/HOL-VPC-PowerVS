@@ -46,6 +46,8 @@ In this HOL we will:
     * Step 4: Create Service credentials with HMAC
     * Step 5: Using the rclone client
 * Take a backup of the Windows and Linux servers.
+    * Step 1: Create service to service authorization
+    * Step 2: Creating a backup policies and plan
 
 ## Key Protect
 
@@ -90,7 +92,7 @@ In this HOL we will:
     * **Data encryption instance**: `<TEAM_NAME>-kms-svc`
     * **Data encryption key**: `<TEAM_NAME>-root-key`
 
-### Step2: Attach Block Storage to Windows VSI
+### Step 2: Attach Block Storage to Windows VSI
 
 1. Connect the encrypted volume to your Windows instance by following the instructions at [Attaching a Block Storage for VPC volume](https://cloud.ibm.com/docs/vpc?topic=vpc-attaching-block-storage). 
 
@@ -200,8 +202,11 @@ Follow the Linux instructions at [Using rclone](https://cloud.ibm.com/docs/cloud
 
 Backups are in effect, automated snapshots with a retention date. Backup policies contain user tags for target resources that associate the policy with block storage volumes, file shares, or virtual server instances with the same user tag. To create backups, at least one user tag that is applied to a resource must match the tag in the backup policy.
 
+### Step 1: Configure IAM service-to-service authorization between VPC Infrastructure and Key Protect
 
-### Step 1: Creating a backup policies and plan
+1. Follow the instructions at [Establishing service-to-service authorizations for the Backup service](https://cloud.ibm.com/docs/vpc?topic=vpc-backup-s2s-auth&interface=ui) to configure the required authorizations
+
+### Step 2: Creating a backup policies and plan
 
 1. Use the instructions [Creating backup policies and plans](https://cloud.ibm.com/docs/vpc?topic=vpc-create-backup-policy-and-plan&interface=ui) to create a policy and plan. Use the standard for naming and:
 
