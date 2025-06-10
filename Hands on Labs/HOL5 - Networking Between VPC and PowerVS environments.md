@@ -81,8 +81,9 @@ ibmcloud tg gateway-create \
     ```
 by using `ssh -i ~/.ssh/hol-key -J root@<FLOATING_IP_FOR_mgmt-01-vsi> root@10.<TEAM_ID>.8.2`.
 5. Once connected to the PowerVSI issue the command `ip route`.
-6. Review the routes, and end the SSH session by typing `exit`.
-7. Try connecting directly via the VPN using the FQDN of the PowerVSI server.
+6. Ping the management host; `ping <TEAM_NAME>-mgmt-01-vsi.<TEAM_NAME>.hol.cloud`
+7. Review the routes, and end the SSH session by typing `exit`.
+8. Try connecting directly via the VPN using the FQDN of the PowerVSI server.
 
 ### Step 5: Troubleshooting
 
