@@ -122,6 +122,8 @@ Network Security groups enablement and configuration takes a little while, pleas
       - **CIDR**: `10.<TEAM_NUMBER>.1.0/24`
       - **Name**: `vpn-subnet`
       - **CIDR**: `10.<TEAM_NUMBER>.0.0/24`
+      - **Name**: `vpe-subnet`
+      - **CIDR**: `10.<TEAM_NUMBER>.2.0/24`
       - **Name**: `app1-app-sn`
       - **CIDR**: `10.<TEAM_NUMBER>.4.64/26`
     - **Network security groups**:
