@@ -98,7 +98,7 @@ ibmcloud pi subnet get $subnetID
    - **Profile**: `System configuration`
    - **Cores**: `0.25`
    - **Memory**: `2`
-   - **Public networks**: `Enable`
+   - **Public networks**: `Disable`
    - **Network**: `<TEAM_NAME>-power-db-sn`
    - **IP Address**: `10.<TEAM_ID>.8.2`
 
