@@ -1,5 +1,7 @@
 # HOL7 - Automation and Infrastructure as Code
 
+**This hands on lab uses IBM Cloud Schematics**. Only follow this lab if you want to explore IBM Schematics.
+
 ## Overview
 
 This Hands on Lab, uses a Terraform script for provisioning infrastructure in IBM Cloud. It provisions:
