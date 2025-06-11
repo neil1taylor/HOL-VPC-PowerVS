@@ -82,8 +82,8 @@ ibmcloud tg gateway-create \
     by using `ssh -i ~/.ssh/hol-key -J root@<FLOATING_IP_FOR_mgmt-01-vsi> root@10.<TEAM_ID>.8.2`.
 
 5. Once connected to the PowerVSI issue the command `ip route`.
-6. Ping the management host; `ping <TEAM_NAME>-mgmt-01-vsi.<TEAM_NAME>.hol.cloud`.
-7. Ping externally; `ping google.com`. Why does the name resolve? Why does the ping fail?
+6. Ping the management host; `ping <TEAM_NAME>-mgmt-01-vsi.<TEAM_NAME>.hol.cloud`. Why does this fail? Is the name resolution response allowed through the the PowerVS Network Security Group? DNS uses UDP port 53, and the custom resolvers are on the VPE subnet. Add a rule to allow UDP source port 53 to all destination ports in the NSG that has the PowerVS VSI as a member
+7. Ping externally; `ping google.com`. Why does the name resolve? Why does the ping fail? Is it because the PowerVS VSI has no access to the Internet?
 8. Review the routes, and end the SSH session by typing `exit`.
 9. Try connecting directly via the VPN using the FQDN of the PowerVSI server.
 
