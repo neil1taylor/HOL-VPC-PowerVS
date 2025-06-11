@@ -87,9 +87,16 @@ ibmcloud tg gateway-create \
 8. Review the routes, and end the SSH session by typing `exit`.
 9. Try connecting directly via the VPN using the FQDN of the PowerVSI server.
 
-**NOTE** if you have problems connecting to the PowerVS VSI via the bastion try the following:
+**NOTE** If you have problems connecting to the PowerVS VSI via the bastion try the following:
 
 `ssh -A -o ServerAliveInterval=60 -o ServerAliveCountMax=600 -o ProxyCommand="ssh -W %h:%p root@<FLOATING_IP_FOR_mgmt-01-vsi> -i ~/.ssh/hol-key" root@10.<TEAM_ID>.8.2 -i ~/.ssh/hol-key`
+
+The final target of the command `root@10.<TEAM_ID>.8.2`
+
+* `-A` (Agent Forwarding) - Forwards your local SSH agent to the remote server, allowing you to use your local SSH keys on the remote machine without copying them there.
+* `-o ServerAliveInterval=60` - Sends a keep-alive message every 60 seconds to prevent the connection from timing out
+* `-o ServerAliveCountMax=600` - Allows up to 600 unanswered keep-alive messages before disconnecting (that's 10 hours of potential downtime)
+* `ProxyCommand="ssh -W %h:%p root@<FLOATING_IP_FOR_mgmt-01-vsi> -i ~/.ssh/hol-key"` - This creates a tunnel through an intermediate server. First connects to `root@<FLOATING_IP_FOR_mgmt-01-vsi>` (the jump host with a public IP). `-W %h:%p tells the jump host to forward the connection to the final destination (%h = hostname, %p = port)`
 
 ### Step 5: Troubleshooting
 
