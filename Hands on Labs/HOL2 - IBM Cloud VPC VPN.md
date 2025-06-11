@@ -467,13 +467,13 @@ The steps are as follows:
 2. In the **Site-to-site gateway** tab, in the **VPN Gateways** tab click **Create**.
 3. Configure the Gateway parameters:
 
-    - **Geography**: North America
-    - **Region**: us-south
-    - **VPN gateway name**: <TEAM_NAME>-site-to-site-vpn
-    - **Resource Group**: <TEAM_NAME>-services-rg
+    - **Geography**: `North America`
+    - **Region**: `us-south`
+    - **VPN gateway name**: `<TEAM_NAME>-site-to-site-vpn`
+    - **Resource Group**: `<TEAM_NAME>-services-rg`
     - **Tags**: `env:mgmt`
-    - **VPC**: <TEAM_NAME>-management-vpc
-    - **Subnet**: <TEAM_NAME>-vpn-sn
+    - **VPC**: `<TEAM_NAME>-management-vpc`
+    - **Subnet**: `<TEAM_NAME>-vpn-sn`
     - **Mode**: `Route-based`
     
 4. Continue with the VPN connection for VPC parameters:
@@ -489,13 +489,20 @@ The steps are as follows:
 
 1. Navigate to **VPC Infrastructure > Routing tables**
 2. Select the route table for the <TEAM_NAME>-management-vpc VPC. 
-3. Add routes for remote VPC subnets pointing to the local VPN gateway.
+3. Add routes for remote VPC subnets pointing to the local VPN gateway:
+    *  **Name**: `<OTHER_TEAM_NAME>-s2s-route`
+    *  **Destination CIDR**: The CIDR of your partner team's VPC. 
+    *  **Next hop type**: `VPN connection`
+    *  **VPN gateway**: `<TEAM_NAME>-site-to-site-vpn`
+    *  **VPN connection**: `<TEAM_NAME>-to-<OTHER_TEAM_NAME>`
+
 4. Review Security Groups and NACLs to allow communication.
+5. Ensure the partner account has a route to your VPC.
 
 ### Step 5: Verify and Test Connection
 
 1. Check VPN connection status in both gateways
-2. Use ping between the managements ervers to verify that packets traverse across the VPN
+2. Use ping between the managements servers to verify that packets traverse across the VPN
 
 ## Questions
 
