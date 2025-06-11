@@ -87,6 +87,10 @@ ibmcloud tg gateway-create \
 8. Review the routes, and end the SSH session by typing `exit`.
 9. Try connecting directly via the VPN using the FQDN of the PowerVSI server.
 
+**NOTE** if you have problems connecting to the PowerVS VSI via the bastion try the following:
+
+`ssh -A -o ServerAliveInterval=60 -o ServerAliveCountMax=600 -o ProxyCommand="ssh -W %h:%p root@<FLOATING_IP_FOR_mgmt-01-vsi> -i ~/.ssh/hol-key" root@10.<TEAM_ID>.8.2 -i ~/.ssh/hol-key`
+
 ### Step 5: Troubleshooting
 
 If you cannot ping or SSH, then using the UI or CLI check the following:
