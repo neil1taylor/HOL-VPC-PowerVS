@@ -1,4 +1,4 @@
-# Hands-on Lab 8: Protecting Workloads with IBM Cloud Security and Compliance Center Workload Protection
+# Hands-on Lab 8: Protecting Workloads with IBM Cloud Security and Compliance Center Workload Protection (Agents)
 
 **This hands on lab focuses on Agents**. Only follow this lab if you want to explore the usage of agents. If you want to just explore CSPM of the IBM Cloud account **do not** follow this lab.
 

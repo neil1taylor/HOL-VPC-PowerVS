@@ -134,8 +134,6 @@ Complete the following steps to configure IBM Cloud Metrics Routing to route met
 
 1. Configure a service-to-service authorization to your IBM Cloud Monitoring instance.
 
-    _You can skip this step. An authorization has already been defined to grant permissions to all teams._
-
     You must use IBM Cloud Identity and Access Management (IAM) to create an authorization that grants IBM Cloud Metrics Routing access to IBM Cloud Monitoring so the IBM Cloud Metrics Routing service can send metrics to your IBM Cloud Monitoring instance.
 
     For more information, see [Creating a S2S authorization to grant access to the IBM Cloud Monitoring service](https://cloud.ibm.com/docs/metrics-router?topic=metrics-router-iam-service-auth&interface=ui).
@@ -225,7 +223,7 @@ You cannot modify predefined dashboards, however, you can copy a predefined dash
 
 Complete the following steps to create a copy of a dashboard for your team:
 1. Go to **Observability > Monitoring > Instances**.
-1. Identify your Monitoring instance **SCC-WP-SAP-DEMO**, and click **Dashboard**.
+1. Identify your Monitoring instance, and click **Dashboard**.
 1. Go to **Dashboards**.
 1. In the *Dashboard Library*, under **IBM**, select a predefined dashboard to copy.
 1. Click **Copy to my Dashboards**.
@@ -289,67 +287,6 @@ Check the predefined VPC dashboards and take a look at the widget configuration 
 - DNS Services - Metrics Summary
 
 For more information, see [VPC dashboards and service metric definitions](https://cloud.ibm.com/docs/vpc?topic=vpc-ibm-monitoring&interface=ui#vpc-metric-definitions).
-
-
-
-## IBM Power Virtual Server
-
-
-To collect metrics to monitor the health of your PowerVS, you can deploy the Monitoring agent on your Linux host.
-
-
-### Configure a PowerVS instance to send metrics to the Monitoring instance
-
-You can deploy the monitoring agent on a Linux PowerVS to forward metrics to a Monitoring instance. The agent uses an access key (token) to authenticate with the IBM Cloud Monitoring instance. The monitoring agent acts as a data collector.
-
-By default, this agent collects core infrastructure and network time series that you can use to monitor the host.
-
-The Monitoring agent automatically collects the following types of system metrics per host:
-- System hosts metrics: These metrics provide information about CPU, memory, and storage usage metrics, that you can use to analyze the performance and resource utilization of all your processes.
-- File and File System metrics: These metrics provide information about files and file system that you can use to analyze file interactions that occur in your system. For example, you can find information about your open files, bytes going in and out, or the percentage of usage of a given file system.
-- Process metrics: These metrics provide information about the processes that run in your servers. For example, you can use these metrics to explore the number of processes, or get client or server information.
-- Network metrics: These metrics provide information about the network. They offer insight to the connections that are established between your applications, containers, and servers. For example, you can find information about the bytes that are being sent or received, or the number of HTTP requests, connections, and latency.
-
-
-Complete the following steps from a command line to deploy the agent:
-
-1. Open a terminal and log in to the IBM Cloud:
-
-    `ibmcloud login -a cloud.ibm.com`
-
-1. Select the account and region where the IBM Cloud Monitoring instance is available.
-
-    `ibmcloud target -r eu-es`
-
-1. Access your Linux host on a PowerVS workspace.
-
-    `ssh root@xx.xx.xx.xx -i .ssh/<Your-Key>`
-
-1. Obtain the Monitoring instance access key. Go to your Monitoring instance, and click **Dashboard**. Then, go to your name and click **Agent access keys**. Copy the default agent key.
-
-1. Obtain the ingestion URL. See [Collector endpoints](https://cloud.ibm.com/docs/monitoring?topic=monitoring-endpoints#endpoints_ingestion_public). Use `ingest.us-south.monitoring.cloud.ibm.com` if your PowerVs is created in Dallas.
-
-1. Deploy the monitoring agent. Run the following command:
-
-    `curl -sL https://ibm.biz/install-sysdig-agent | sudo bash -s -- --access_key <ACCESS_KEY> --collector ingest.private.us-south.monitoring.cloud.ibm.com --universal_ebpf --collector_port 6443 --secure true --check_certificate false --tags powervs:<POWERVS_NAME> --additional_conf 'sysdig_capture_enabled: false\nhost_scanner:\n enabled: true\n scan_on_start: true\nkspm_analyzer:\n enabled: true'`
-
-1. Open the dragent.yaml file that is located in /opt/draios/etc/.
-
-1. Add the following configuration parameter:
-
-    ```
-    feature:
-      mode: monitor_light
-    ```
-
-1. Restart the agent.
-
-    `systemctl restart dragent`
-
-1. For the Monitoring instance, click **Dashboard**. Go to **Dashboards > Host Infrastructure > Linux Hpst Overview**.
-
-1. Copy the dashboard and explore the metrics that are being collected.
-
 
 
 
