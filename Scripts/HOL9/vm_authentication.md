@@ -15,6 +15,7 @@ iam_token=$(curl -s -X POST https://api.metadata.cloud.ibm.com/instance_identity
 
 2.1 List the trusted profiles
        `curl -d "cr_token=${instance_identity_token}" "https://iam.cloud.ibm.com/identity/profiles"`
+       
 2.2 Use the TP id and generate iam token
 ```
 iam_token=$(curl -s -X POST https://api.metadata.cloud.ibm.com/instance_identity/v1/iam_token?version=2024-11-12 \
