@@ -271,13 +271,13 @@ The RHEL system roles for setting up SAP application are available in the root d
 Use the following command to prepare the operating system for an SAP HANA workload.
 
 ```sh
-ansible-playbook -i /root/inventory /root/sap-hana.yml
+ansible-playbook -i /root/inventory /root/sap-hana.yml -e sap_domain=sap.com
 ```
 
 Use the following command to prepare the operating system for an SAP NetWeaver workload.
 
 ```sh
-ansible-playbook -i /root/inventory /root/sap-netweaver.yml
+ansible-playbook -i /root/inventory /root/sap-netweaver.yml -e sap_domain=sap.com
 ```
 
 For more information about customizing the operating system, see the following documentation.
