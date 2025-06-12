@@ -6,18 +6,20 @@ instance_identity_token=`curl -X PUT https://api.metadata.cloud.ibm.com/instance
 ## Step2: Generate IAM token if a TP was already attached to the instance during VM creation
 ```
 iam_token=$(curl -s -X POST https://api.metadata.cloud.ibm.com/instance_identity/v1/iam_token?version=2024-11-12 \
-  -H "Authorization: Bearer $instance_identity_token"
+  -H "Authorization: Bearer $instance_identity_token" | jq -r '.access_token'
 ```
 
 **Or** 
 
 ## Step2: Generate IAM token if TP was attached later after instance creation
 
-2.1 List the trusted profiles
+### 2.1 List the trusted profiles
        `curl -d "cr_token=${instance_identity_token}" "https://iam.cloud.ibm.com/identity/profiles"`
 
 Make a note of it.
-2.2 Use the TP id and generate iam token
+
+### 2.2 Use the TP id and generate iam token
+
 Prerequisites: 
 1. Trusted profile ID
 Replace the value below in place:  **profile_id**
