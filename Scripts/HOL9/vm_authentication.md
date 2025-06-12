@@ -28,7 +28,7 @@ iam_token=$(curl -s -X POST https://api.metadata.cloud.ibm.com/instance_identity
   -H "Content-Type: application/json" \
   -d '{
     "trusted_profile": {
-      "id": "profile_id4"
+      "id": "profile_id"
     }
   }' | jq -r '.access_token')
 ```
