@@ -37,6 +37,7 @@ This document references:
 * Step 3: Create a connection to the Management VPC
 * Step 4: Verify
 * Step 5: Troubleshooting
+* Step 6: Configure Proxy for Internet Access
 
 ### Step 1: Create a transit gateway
 
@@ -82,8 +83,8 @@ ibmcloud tg gateway-create \
     by using `ssh -i ~/.ssh/hol-key -J root@<FLOATING_IP_FOR_mgmt-01-vsi> root@10.<TEAM_ID>.8.2`.
 
 5. Once connected to the PowerVSI issue the command `ip route`.
-6. Ping the management host; `ping <TEAM_NAME>-mgmt-01-vsi.<TEAM_NAME>.hol.cloud`. Why does this fail? Is the name resolution response allowed through the the PowerVS Network Security Group? DNS uses UDP port 53, and the custom resolvers are on the VPE subnet. Add a rule to allow UDP source port 53 to all destination ports in the NSG that has the PowerVS VSI as a member
-7. Ping externally; `ping google.com`. Why does the name resolve? Why does the ping fail? Is it because the PowerVS VSI has no access to the Internet?
+6. Ping the management host; `ping <TEAM_NAME>-mgmt-01-vsi.<TEAM_NAME>.hol.cloud`. Why does this fail? Is the name resolution response allowed through the the PowerVS Network Security Group? DNS uses UDP port 53, and the custom resolvers are on the VPE subnet. Add a rule to allow UDP source port 53 to all destination ports in the NSG that has the PowerVS VSI as a member.
+7. Ping externally; `ping google.com`. Why does the name resolve but the ping fail? Is it because the PowerVS VSI has no access to the Internet?
 8. Review the routes, and end the SSH session by typing `exit`.
 9. Try connecting directly via the VPN using the FQDN of the PowerVSI server.
 
@@ -108,3 +109,40 @@ If you cannot ping or SSH, then using the UI or CLI check the following:
 * VPC routes.
 * TGW routes.
 * VSI firewalls.
+
+## Step 6: Configure Proxy for Internet Access
+
+You will have noticed that the PowerVS does not have access to the Internet. We will rectify this by using a proxy server:
+
+1. Install Squid on `<TEAM_NAME>-mgmt-01-vsi` using `apt install squid -y`.
+2. Use the command `curl -I -x localhost:3128 https://google.com` to see that the configuration is correct. You should see `HTTP/1.1 200 Connection established`.
+3. In the VPC security group attached to `<TEAM_NAME>-mgmt-01-vsi`, allow inbound TCP port 3128 to `10.<TEAM_ID>.1.4` from CIDR `10.<TEAM_ID>.8.0/24`.
+4. By default, only the localhost can access the proxy so use the following commands to allow the predefined `localnet acl` access control. The `localnet acl` includes `10.0.0.0/8`:
+
+   ```bash
+   echo "http_access allow localnet" > /etc/squid/conf.d/team-1.conf
+   systemctl restart squid
+   ```
+
+5. In the PowerVS network security group where the `<TEAM_NAME>-db-powervs-vsi` is a member, allow inbound source TCP port 3128 to destination ports `1 - 65535`.
+6. On `<TEAM_NAME>-db-powervs-vsi` create a file that contains exports that sets the proxies:
+
+      1. Open a terminal, use vi to modify the file `~/.bash_profile`, replacing <proxy_ip_address> and <proxy_port> with the actual values of your proxy server: 
+
+      ```bash
+      export http_proxy=http://10.<TEAM_ID>.1.4:3128
+      export https_proxy=http://10.<TEAM_ID>.1.4:3128
+      export HTTP_PROXY=http://10.<TEAM_ID>.1.4:3128
+      export HTTPS_PROXY=http://10.<TEAM_ID>.1.4:3128
+      export no_proxy=161.0.0.0/0,10.0.0.0/8
+      ```
+
+      For information:
+
+      * http_proxy and HTTP_PROXY: These are for HTTP traffic (port 80). 
+      * https_proxy and HTTPS_PROXY: These are for HTTPS traffic (port 443). 
+      * no_proxy: This specifies networks or hosts that should bypass the proxy.
+      * To ensure these environment variables are available after a reboot, we add them to a file ~/.bash_profile.
+
+7. Type `source ~/.bash_profile`. 
+8. Test the Proxy with `curl -I https://www.google.com`. If the proxy is configured correctly, you should see the HTTP headers from Google and `HTTP/1.1 200 Connection established`

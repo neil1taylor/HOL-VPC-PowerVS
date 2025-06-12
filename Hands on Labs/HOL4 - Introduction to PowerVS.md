@@ -129,15 +129,16 @@ Network Security groups enablement and configuration takes a little while, pleas
     - **Network security groups**:
       - **Name**: `allow-nsg` 
       - **Inbound rules**:
-        - **Any**:
-          - **Action**: `Allow`
-          - **Protocol**: `Any`
-          - **Remote**:` mgmt-servers`
         - **TCP**:
           - **Action**: `Allow`
-          - **Protocol**: `Any`
-          - **Remote**: `app1-app-sn`
-          - **Destination port range**: `5432-5432`
+            - **Source**: `22`
+            - **Remote**:` mgmt-servers`
+          - **Action**: `Allow`
+            - **Source**: `22`
+            - **Remote**:` vpn-servers`
+          - **Action**: `Allow`
+            - **Remote**: `app1-app-sn`
+            - **Destination port range**: `5432-5432`
       - **Members**: `<TEAM_NAME>db-powervs-vsi`
 
 ## Questions
