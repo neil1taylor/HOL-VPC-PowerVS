@@ -15,22 +15,29 @@ iam_token=$(curl -s -X POST https://api.metadata.cloud.ibm.com/instance_identity
 
 2.1 List the trusted profiles
        `curl -d "cr_token=${instance_identity_token}" "https://iam.cloud.ibm.com/identity/profiles"`
-       
+
+Make a note of it.
 2.2 Use the TP id and generate iam token
+Prerequisites: 
+1. Trusted profile ID
+Replace the value below in place:  **profile_id**
+
 ```
 iam_token=$(curl -s -X POST https://api.metadata.cloud.ibm.com/instance_identity/v1/iam_token?version=2024-11-12 \
   -H "Authorization: Bearer $instance_identity_token" \
   -H "Content-Type: application/json" \
   -d '{
     "trusted_profile": {
-      "id": "Profile-4ed68d9b-40fb-4734-8871-bfc96735e574"
+      "id": "profile_id4"
     }
   }' | jq -r '.access_token')
 ```
 
 ## Step 3: List policies in account
+
+Replace the value below in place:  **account_id**
 ```
-curl -X GET "https://private.iam.cloud.ibm.com/v2/policies?account_id=cb83fe3c3d9b4308a919413aa69e9e37" -H 'Content-Type: application/json' -H "Authorization: $iam_token" -s| jq .
+curl -X GET "https://private.iam.cloud.ibm.com/v2/policies?account_id=account_id" -H 'Content-Type: application/json' -H "Authorization: $iam_token" -s| jq .
 ```
 
 ## Step4: Get VM deatils
