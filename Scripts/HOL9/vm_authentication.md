@@ -32,3 +32,8 @@ iam_token=$(curl -s -X POST https://api.metadata.cloud.ibm.com/instance_identity
 ```
 curl -X GET "https://private.iam.cloud.ibm.com/v2/policies?account_id=cb83fe3c3d9b4308a919413aa69e9e37" -H 'Content-Type: application/json' -H "Authorization: $iam_token" -s| jq .
 ```
+
+## Step4: Get VM deatils
+```
+curl -X GET "http://api.metadata.cloud.ibm.com/metadata/v1/instance/initialization?version=2024-11-12"    -H "Accept: application/json"    -H "Authorization: Bearer $instance_identity_token"    | jq -r
+```
