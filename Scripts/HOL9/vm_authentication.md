@@ -35,9 +35,9 @@ iam_token=$(curl -s -X POST https://api.metadata.cloud.ibm.com/instance_identity
 
 ## Step 3: List policies in account
 
-Replace the value below in place:  **account_id**
+Replace the value below in place:  **ACCOUNT_ID**
 ```
-curl -X GET "https://private.iam.cloud.ibm.com/v2/policies?account_id=account_id" -H 'Content-Type: application/json' -H "Authorization: $iam_token" -s| jq .
+curl -X GET "https://private.iam.cloud.ibm.com/v2/policies?account_id=ACCOUNT_ID" -H 'Content-Type: application/json' -H "Authorization: $iam_token" -s| jq .
 ```
 
 ## Step4: Get VM deatils
