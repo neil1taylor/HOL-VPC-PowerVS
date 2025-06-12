@@ -44,5 +44,5 @@ curl -X GET "https://private.iam.cloud.ibm.com/v2/policies?account_id=ACCOUNT_ID
 
 ## Step4: Get VM deatils
 ```
-curl -X GET "http://api.metadata.cloud.ibm.com/metadata/v1/instance/initialization?version=2024-11-12"    -H "Accept: application/json"    -H "Authorization: Bearer $instance_identity_token"    | jq -r
+curl -X GET "https://api.metadata.cloud.ibm.com/metadata/v1/instance/initialization?version=2024-11-12"    -H "Accept: application/json"    -H "Authorization: Bearer $instance_identity_token"    | jq -r
 ```
