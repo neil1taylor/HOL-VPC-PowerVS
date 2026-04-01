@@ -18,7 +18,7 @@ What you will learn:
 
 Cloud governance is a framework of guidelines, policies, and practices that help standardize the adoption and management of cloud services securely, mitigate risks, meet compliance requirements, and optimize costs.
 
-_Observability is a core displine of Cloud governance._
+_Observability is a core discipline of Cloud governance._
 
 Observability involves monitoring and understanding the health and performance of systems that run in the cloud. By analyzing data such as logs, and metrics, you can identify issues and troubleshoot problems.
 
@@ -114,13 +114,25 @@ Complete the following steps to provision an instance of IBM Cloud Monitoring:
 1. Click Catalog. The list of the services that are available in IBM Cloud opens.
 1. To filter the list of services that is displayed, select the **Logging and Monitoring** category.
 1. Click the **IBM Cloud Monitoring** tile.
-1. Select the location where you plan to provision the instance. Choose `eu-es`
+1. Select the location where you plan to provision the instance. Choose `us-south`
 1. Select the **Graduated Tier** service plan.
 1. Enter a name for the service instance. Use <TEAM_NAME>-mon-instance
 1. Select the resource group for your team <TEAM_NAME>-management-rg. By default, the Default resource group is set.
 1. Enable platform metrics.
 1. Click **Create**.
 After you provision an instance, the UI opens.
+
+**CLI alternative:**
+
+```bash
+# Target us-south region
+ibmcloud target -r us-south -g <TEAM_NAME>-management-rg
+
+# Create Monitoring instance with platform metrics enabled
+ibmcloud resource service-instance-create <TEAM_NAME>-mon-instance sysdig-monitor graduated-tier us-south \
+  -g <TEAM_NAME>-management-rg \
+  --parameters '{"default_receiver": true}'
+```
 
 Reference information:
 - [Provision an instance through the UI](https://cloud.ibm.com/docs/monitoring?topic=monitoring-provision#provision_ui)
@@ -155,11 +167,11 @@ Complete the following steps to configure IBM Cloud Metrics Routing to route met
 
         Select **Drop** for the rule to drop metrics matching this rule.
 
-        Add the inclusion filters to determine the metrics routed to the targets specified in the rule. Select **Location in Dallas (us-south) Madrid (eu-es)**.
+        Add the inclusion filters to determine the metrics routed to the targets specified in the rule. Select **Location in Dallas (us-south)**.
 
         To add multiple inclusion filters, click **Add filter** to add additional filters.
 
-    1. In the *Targets* section, select yout monitoring target from the list.
+    1. In the *Targets* section, select your monitoring target from the list.
 
     1. [Optional] Click **Add rule** to add additional rules to the route. The order of route rules affects the routing behavior. Rules are processed in order and once a rule is matched, the subsequent rules are not processed. The order of the routing rules can be changed by clicking the up and down arrows to the right of each rule definition.
 
@@ -169,6 +181,37 @@ Complete the following steps to configure IBM Cloud Metrics Routing to route met
     1. Review the route definition ensuring the order of the rules is as intended.
     1. Enter a name for the route <TEAM_NAME>-mon-route.
     1. Click **Create**.
+
+**CLI alternative:**
+
+```bash
+# Install the metrics-router plugin
+ibmcloud plugin install metrics-router -f
+
+# Create S2S authorization: Metrics Router -> Monitoring
+ibmcloud iam authorization-policy-create metrics-router sysdig-monitor "Supertenant Metrics Publisher"
+
+# Set the primary metadata region (required before creating targets)
+echo "y" | ibmcloud metrics-router setting update --primary-metadata-region us-south
+
+# Get the Monitoring instance CRN
+MON_CRN=$(ibmcloud resource service-instance <TEAM_NAME>-mon-instance --output json | jq -r '.[0].crn')
+
+# Create a Metrics Router target
+ibmcloud metrics-router target create \
+  --name <TEAM_NAME>-mr-target \
+  --destination-crn "$MON_CRN" \
+  --region us-south
+
+# Get the target ID
+MR_TARGET_ID=$(ibmcloud metrics-router target list --output json | jq -r '.targets[] | select(.name=="<TEAM_NAME>-mr-target") | .id')
+
+# Create a route to send metrics from us-south
+ibmcloud metrics-router route create \
+  --name <TEAM_NAME>-mr-route \
+  --rules "[{\"action\": \"send\", \"targets\":[{\"id\": \"$MR_TARGET_ID\"}], \"inclusion_filters\":[{\"operand\": \"location\",\"operator\": \"is\",\"values\": [\"us-south\"]}]}]" \
+  --force
+```
 
 
 Reference information:
@@ -292,7 +335,7 @@ For more information, see [VPC dashboards and service metric definitions](https:
 
 ## Sending notifications through IBM Cloud Event Notifications
 
-You can configure alert in IBM Cloud Logs and IBM Cloud Monitoring that send notifications through IBM Clooud Event Notifications to different types of destinations.
+You can configure alert in IBM Cloud Logs and IBM Cloud Monitoring that send notifications through IBM Cloud Event Notifications to different types of destinations.
 
 Complete the following steps to configure alert notifications to be triggered through Event Notifications:
 - [Configure alerts in IBM Cloud Monitoring that send email notifications](https://cloud.ibm.com/docs/monitoring?topic=monitoring-tutorial-en)

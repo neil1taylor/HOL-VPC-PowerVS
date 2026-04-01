@@ -41,7 +41,7 @@ In this HOL we will:
     * Step 3: Configuring Ubuntu VSI for NFS
 * Create a Cloud Object Storage (COS) instance and bucket.
     * Step 1: Creating a service instance
-    * Step 2: Create a service athorization between Cloud Object Storage and Key protect
+    * Step 2: Create a service authorization between Cloud Object Storage and Key protect
     * Step 3: Create a new bucket and associate the key with it
     * Step 4: Create Service credentials with HMAC
     * Step 5: Using the rclone client
@@ -51,12 +51,12 @@ In this HOL we will:
 
 ## Key Protect
 
-### Step1: Create a Key Protect service instance
+### Step 1: Create a Key Protect service instance
 
 1. Follow the instructions at [Creating an instance](https://cloud.ibm.com/docs/key-protect?topic=key-protect-provision) to create a Key Protect instance with the following parameters, using the UI or CLI:
 
     * **Location**: `Dallas (us-south)`
-    * **Plan**: `standard`
+    * **Plan**: `Tiered pricing`
     * **Service name**: `<TEAM_NAME>-kms-svc`
     * **Resource group**: `<TEAM_NAME>-services-rg`
     * **Tags**: `env:services`
@@ -157,7 +157,7 @@ Follow the instructions at [Establishing service-to-service authorizations for F
 
 4. Click **Create**.
 
-### Step 2: Create a service athorization between Cloud Object Storage and Key protect
+### Step 2: Create a service authorization between Cloud Object Storage and Key Protect
 
 1. Follow the instructions at [Integrating a supported service](https://cloud.ibm.com/docs/key-protect?topic=key-protect-integrate-services#grant-access)
 
@@ -183,7 +183,7 @@ Follow the instructions at [Establishing service-to-service authorizations for F
 
 Follow the instructions at [Service credentials](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-service-credentials) using the following:
 
-* **Name**: `<TEAM_ID>-object-creds`
+* **Name**: `<TEAM_NAME>-object-creds`
 * **Role**: `Manager`
 * **HMAC**: `Enabled`
 
@@ -240,7 +240,7 @@ If you have time:
 9. What is the required NFS version for File Storage for VPC, and how is data consistency achieved when multiple users perform read and write operations?
 10. Explain the primary purpose of IBM Cloud Backup for VPC and what types of storage resources it supports for automated backups. Also, how are backup policies configured to target these resources?
 
-## Additiuonal Information
+## Additional Information
 
 ### Network Security
 - Ensure security groups allow only necessary NFS traffic

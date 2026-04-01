@@ -18,7 +18,7 @@ What you will learn:
 
 Cloud governance is a framework of guidelines, policies, and practices that help standardize the adoption and management of cloud services securely, mitigate risks, meet compliance requirements, and optimize costs.
 
-_Observability is a core displine of Cloud governance._
+_Observability is a core discipline of Cloud governance._
 
 Observability involves monitoring and understanding the health and performance of systems that run in the cloud. By analyzing data such as logs, and metrics, you can identify issues and troubleshoot problems.
 
@@ -118,13 +118,34 @@ Complete the following steps to provision an instance through the UI:
 1. Click Catalog. The list of the services that are available in IBM Cloud opens.
 1. To filter the list of services that is displayed, select the **Logging and Monitoring** category.
 1. Click the **IBM Cloud Logs** tile.
-1. Select the location where you plan to provision the instance. Choose `eu-es`
+1. Select the location where you plan to provision the instance. Choose `us-south`
 1. Enter a name for the service instance. Use <TEAM_NAME>-cl-instance
 1. Select the resource group for your team <TEAM_NAME>-management-rg. By default, the Default resource group is set.
 1. Select the Standard service plan.
 1. Choose a retention plan. Valid values are 7 days, 14 days, 30 days, 60 days or 90 days. Choose 7 days.
 1. Click Create.
 After you provision an instance, the UI opens.
+
+**CLI alternative:**
+
+```bash
+# Install the cloud-logs plugin
+ibmcloud plugin install cloud-logs -f
+
+# Target the us-south region
+ibmcloud target -r us-south -g <TEAM_NAME>-management-rg
+
+# Create Cloud Logs instance
+ibmcloud resource service-instance-create <TEAM_NAME>-cl-instance logs standard us-south \
+  -g <TEAM_NAME>-management-rg
+
+# Get the Cloud Logs instance CRN and GUID
+CL_CRN=$(ibmcloud resource service-instance <TEAM_NAME>-cl-instance --output json | jq -r '.[0].crn')
+CL_GUID=$(ibmcloud resource service-instance <TEAM_NAME>-cl-instance --output json | jq -r '.[0].guid')
+
+# Configure the Cloud Logs CLI to target your instance
+ibmcloud logs config set service-url "https://$CL_GUID.api.us-south.logs.cloud.ibm.com"
+```
 
 Reference information:
 - [Provision an instance through the UI](https://cloud.ibm.com/docs/cloud-logs?topic=cloud-logs-instance-provision&interface=ui)
@@ -210,6 +231,32 @@ Complete the following steps to configure IBM Cloud Activity Tracking to route a
     1. Enter a name for the route <TEAM_NAME>-at-route.
     1. Click **Create**.
 
+**CLI alternative:**
+
+```bash
+# Install the atracker plugin
+ibmcloud plugin install atracker -f
+
+# Create S2S authorization: Activity Tracker -> Cloud Logs
+ibmcloud iam authorization-policy-create atracker logs Sender
+
+# Create an Activity Tracker target pointing to your Cloud Logs instance
+CL_CRN=$(ibmcloud resource service-instance <TEAM_NAME>-cl-instance --output json | jq -r '.[0].crn')
+ibmcloud atracker target create \
+  --name <TEAM_NAME>-at-target \
+  --type cloud_logs \
+  --target-crn "$CL_CRN" \
+  --region us-south
+
+# Get the target ID
+AT_TARGET_ID=$(ibmcloud atracker target list --output json | jq -r '.targets[] | select(.name=="<TEAM_NAME>-at-target") | .id')
+
+# Create a route to send all events to the target
+ibmcloud atracker route create \
+  --name <TEAM_NAME>-at-route \
+  --target-ids $AT_TARGET_ID \
+  --locations "*"
+```
 
 Reference information:
 - [Managing IBM Cloud Logs targets through the UI](https://cloud.ibm.com/docs/atracker?topic=atracker-target_v2_icl&interface=ui)
@@ -351,7 +398,7 @@ Complete the following steps to import a dashboard:
 1. Identify your Cloud Logs instance and click **Dashboard**.
 1. Go to **Dashboards > Custom Dashboards**.
 1. Click **New > Import dashboard**.
-1. Select [secrets_manager_06-07-2025.json](resources/HOL6/secrets_manager_06-07-2025.json) file from your system.
+1. Select [secrets-manager-dashboard.json](../Scripts/secrets-manager-dashboard.json) file from your system.
 1. Click **Import**.
 
 ### Parsing rules
@@ -463,9 +510,9 @@ Complete the following steps to create custom views to monitor your VPC infrastr
 
     Dataprime query to add metadata to log records: `source logs | add metadata from $m` Name view: <TEAM_NAME> Add metadata to log record
 
-    Lucene query to list VPC instances that are started: `action:"is.instance.instance.start" Name view: <TEAM_NAME> VSIs started
+    Lucene query to list VPC instances that are started: `action:"is.instance.instance.start"` Name view: <TEAM_NAME> VSIs started
 
-    Lucene query to list VPC instances that are stopped: `action:"is.instance.instance.stop" Name view: <TEAM_NAME> VSIs stopped
+    Lucene query to list VPC instances that are stopped: `action:"is.instance.instance.stop"` Name view: <TEAM_NAME> VSIs stopped
 
     Use the list of events in [VPC events](https://cloud.ibm.com/docs/vpc?topic=vpc-at_events&interface=ui#events-network) and add a query to monitor when a network ACL is created or deleted.
 
@@ -492,12 +539,14 @@ Query 2: `message.message:("Health check for server" AND "failed" AND "Layer4 co
 IBM Power Virtual Server generates Activity Tracking events that you can use to monitor and report PowerVS activity in your account. For more information, see [Activity Tracking events for IBM Power Virtual Server](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-at-events)
 
 
-Generate some events in your account by running the following CLI commands:
+Generate some events in your account by running the following CLI commands (replace `<INSTANCE_ID>` with your PowerVS VSI instance ID):
 
-ibmcloud pi instance action b455235a-d7bd-408f-9bf9-a81b431e03f5 --operation start
-ibmcloud pi instance action b455235a-d7bd-408f-9bf9-a81b431e03f5 --operation stop
-ibmcloud pi instance action b455235a-d7bd-408f-9bf9-a81b431e03f5 --operation soft-reboot
-ibmcloud pi instance action b455235a-d7bd-408f-9bf9-a81b431e03f5 --operation hard-reboot
+```bash
+ibmcloud pi instance action <INSTANCE_ID> --operation start
+ibmcloud pi instance action <INSTANCE_ID> --operation stop
+ibmcloud pi instance action <INSTANCE_ID> --operation soft-reboot
+ibmcloud pi instance action <INSTANCE_ID> --operation hard-reboot
+```
 
 
 ### Create custom views
@@ -506,7 +555,7 @@ Complete the following steps to create custom views to monitor your VPC infrastr
 1. Go to **Observability > Logging > Instances**.
 1. Identify your Cloud Logs instance and click **Dashboard**.
 1. Click **Explore Logs > Logs**.
-1. In *subsystem*, select **power-iass:<TEAMID-WorkspaceID>**
+1. In *subsystem*, select **power-iaas:<TEAMID-WorkspaceID>**
 1. Save the view. Name it **PowerVS events**
 1. Create a folder **PowerVS** and move your view to this folder.
 1. Create and save the following views and explore the options to customize the view by adding columns for example:
@@ -515,9 +564,9 @@ Complete the following steps to create custom views to monitor your VPC infrastr
 
     Lucene query to list all the events generated when an instance is started: `requestData.action:"start"`  Name view: `PowerVS instance started`
 
-    Lucene query to list all the events generated when an instance is stopped: `requestData.action:"stop""`  Name view: `PowerVS instance stopped`
+    Lucene query to list all the events generated when an instance is stopped: `requestData.action:"stop"`  Name view: `PowerVS instance stopped`
 
-    Lucene query to list all the events generated when an instance gets a soft-reboot: `action:"power-iaas.pvm-instance.renew" AND requestData.action:"soft\-reboot"`  Name view: `PowerVS soft-rebbot`
+    Lucene query to list all the events generated when an instance gets a soft-reboot: `action:"power-iaas.pvm-instance.renew" AND requestData.action:"soft\-reboot"`  Name view: `PowerVS soft-reboot`
 
     Lucene query to list all the events generated when an instance gets a hard-reboot: `action:"power-iaas.pvm-instance.renew" AND requestData.action:"hard\-reboot"`  Name view: `PowerVS hard-reboot`
 
@@ -531,7 +580,7 @@ Complete the following steps to create a parsing rule that extracts the PowerVS 
 
     Rule group name: **PowerVS**
     Rule Matcher Applications: **ibm-audit-event**
-    Rule matcher subsystems: Choose your **power-iass:<TEAMID-WorkspaceID>**
+    Rule matcher subsystems: Choose your **power-iaas:<TEAMID-WorkspaceID>**
     Severity: **Info**
 
 1. Select the **Extract** rule. Then, enter the following details:
@@ -555,7 +604,7 @@ Complete the following steps to create a dashboard:
 1. In *Add new*, click **New > Create new dashboard**
 1. Name the dashboard **PowerVS Overview**.
 1. Click the `+` symbol to add widgets. Add a **Section**. Name the section **Actions**
-1. Click the manage filters icon (funnel), and click **+Filter**. Select the field **subsystem**. Select your `power-iass:<workspaceID>`
+1. Click the manage filters icon (funnel), and click **+Filter**. Select the field **subsystem**. Select your `power-iaas:<workspaceID>`
 
     Add the field **pwInstanceID** as a filter to the dashboard.
 
@@ -599,8 +648,8 @@ Complete the following steps to create an alert:
     Alert type: **Standard**
     Query: `reason.reasonCode.numeric:[400 TO 500]`
     Applications: **ibm-audit-event**
-    Subsystem: **power-iass:<TEAMID-WorkspaceID>**
-    Severities: Clicl **All**
+    Subsystem: **power-iaas:<TEAMID-WorkspaceID>**
+    Severities: Click **All**
     Condition: **More than usual**
     Minimum threshold: 0
     Time Window: 5 minutes
@@ -620,7 +669,7 @@ Check the Incidents page to see that the alert has triggered. Check out the aler
 
 ## Sending notifications through IBM Cloud Event Notifications
 
-You can configure alert in IBM Cloud Logs and IBM Cloud Monitoring that send notifications through IBM Clooud Event Notifications to different types of destinations.
+You can configure alert in IBM Cloud Logs and IBM Cloud Monitoring that send notifications through IBM Cloud Event Notifications to different types of destinations.
 
 Complete the following steps to configure alert notifications to be triggered through Event Notifications:
 - [Configure alerts in IBM Cloud Monitoring that send email notifications](https://cloud.ibm.com/docs/monitoring?topic=monitoring-tutorial-en)

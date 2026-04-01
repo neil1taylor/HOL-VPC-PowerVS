@@ -116,8 +116,6 @@ This HOL deploys a simple three-tier application that is deployed via cloud-init
    - PostgreSQL database configured for remote access
    - Sample table structure for testing
 
-See [] for further her details
-
 ## Resources created in the HOL
 
 The script includes all the following resources:
@@ -157,13 +155,12 @@ The terraform scripts provisions all the required resources and provisions the V
 
 1. **main.tf** - Contains all the resource definitions, referencing variables in variables.tf
 2. **variables.tf** - Declares all the variables used in the configuration
-3. **terraform.tfvars** - Contains all the parameter values for the variables
-4. **User Data** - This directory contains the e userdata scripts for the VSIs:
+3. **User Data** - This directory contains the userdata scripts for the VSIs:
    * vnf_user_data.yaml: Cloud-init configuration for virtual network functions (VNF) VSI
    * web_user_data.yaml: Cloud-init configuration for web tier VSI
    * app_user_data.yaml: Cloud-init configuration for application tier VSI
    * db_user_data.yaml: Cloud-init configuration for database tier VSI
-5. **Scripts** - This directory contains the scripts that installs and configures the software in each tier th:
+5. **Scripts** - This directory contains the scripts that install and configure the software in each tier:
    * web-tier.sh: The main script for setting up the web tier
    * app-tier.sh: The main script for setting up the application tier
    * db-tier.sh: The main script for setting up the database tier
@@ -211,7 +208,7 @@ The high level instructions are as follows:
    * **Folder**: `terraform`
 5. Click **Next**.
 6. In the **workspace details** section:
-   - **Workspave name**:  `<TEAM_ID>-app1`
+   - **Workspace name**:  `<TEAM_NAME>-app1`
    - **Tags**: `env:app1`
    - **Resource group**: `<TEAM_NAME>-management-rg`. This is the resource group where you want to create the workspace
    - **Location**: `Dallas`
@@ -223,8 +220,11 @@ The high level instructions are as follows:
 
 1. After creating the workspace, navigate to the **Variables** tab.
 2. Schematics will automatically import variables from your `variables.tf` file.
-3. Verify the variable values.
-4. Ensure you change the `team_number` to match your <TEAM_NUMBER>
+3. Update the following variables:
+   - **team_number**: Change to match your `<TEAM_ID_NUMBER>`
+   - **image_name**: Change to `ibm-ubuntu-24-04-4-minimal-amd64-2` (the default Ubuntu 20.04 image is no longer available)
+   - **ssh_key_name**: Change to `ssh-key-1` (must match the SSH key suffix created in HOL1)
+4. Verify all other variable values are correct.
 
 ### Step 3: Generate and Apply the Plan
 
@@ -236,14 +236,50 @@ The high level instructions are as follows:
 
 ### Step 4: Create a connection to the App1 VPC
 
-1. Use the instructions at [Adding a connection](https://cloud.ibm.com/docs/transit-gateway?topic=transit-gateway-adding-connections&interface=cli) to connect the <TEAM_NAME>-app1-vpc VPC. Use the connection name `app1-vpc`.
+1. Use the instructions at [Adding a connection](https://cloud.ibm.com/docs/transit-gateway?topic=transit-gateway-adding-connections&interface=ui) to connect the `<TEAM_NAME>-app1-vpc` VPC to the transit gateway created in HOL5. Use the connection name `<TEAM_NAME>-app1-vpc`.
+
+**CLI alternative:**
+
+```bash
+# Get the Transit Gateway ID
+TGW_ID=$(ibmcloud tg gateways --output json | jq -r '.[] | select(.name=="<TEAM_NAME>-tgw-01") | .id')
+
+# Get the App1 VPC CRN
+APP1_VPC_CRN=$(ibmcloud is vpc <TEAM_NAME>-app1-vpc --output JSON | jq -r '.crn')
+
+# Create the connection
+ibmcloud tg connection-create $TGW_ID \
+  --name <TEAM_NAME>-app1-vpc \
+  --network-type vpc \
+  --network-id "$APP1_VPC_CRN"
+```
 
 ### Step 5: Access Your Resources
 
 1. Once the deployment is complete, navigate to the **Resources** tab to see the provisioned infrastructure.
 2. You can also go to the IBM Cloud dashboard to view and manage your newly created resources.
 
-ADD ANSIBLE HERE
+### Alternative: Running Terraform Locally
+
+If you prefer to run Terraform locally instead of using Schematics:
+
+```bash
+# Clone the repository
+git clone https://github.com/neil1taylor/simple-three-tier-app.git
+cd simple-three-tier-app/terraform
+
+# Create a terraform.tfvars file with your team settings
+cat > terraform.tfvars <<EOF
+team_number    = <TEAM_ID_NUMBER>
+image_name     = "ibm-ubuntu-24-04-4-minimal-amd64-2"
+ssh_key_name   = "ssh-key-1"
+EOF
+
+# Initialise, plan, and apply
+terraform init
+terraform plan
+terraform apply
+```
 
 
 

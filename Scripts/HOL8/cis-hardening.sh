@@ -376,7 +376,7 @@ EOF
 #run_command 'echo "SystemMaxUse=1G" >> /etc/systemd/journald.conf' "6.3.2 Limit journal size"
 #run_command 'systemctl restart systemd-journald' "6.3.2 Restart journald"
 
-# Skip for deno
+# Skip for demo
 #start_section "6.4"
 
 # 6.4.1 - Enable process accounting

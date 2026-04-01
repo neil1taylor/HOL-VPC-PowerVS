@@ -22,7 +22,7 @@ SSH Key | <TEAM_NAME>-ssh-key-2 | Deployed via CLI
 VPC | <TEAM_NAME>-management-vpc | Deployed via UI
 Private DNS Instance | <TEAM_NAME>-dns-srv | Deployed via UI
 Private DNS Custom Resolvers | |
-Private DNS Zone | team<TEAM_NUMBER>.hol.cloud |
+Private DNS Zone | team<TEAM_ID_NUMBER>.hol.cloud |
 Floating IP | <TEAM_NAME>-mgmt-fip |
 Public Gateway | <TEAM_NAME>-pgw-01-pgw | Attach to all VPC subnets
 Security Group | <TEAM_NAME>-vpn-sg | 
@@ -30,9 +30,10 @@ Security Group | <TEAM_NAME>-mgmt-sg |
 Security Group | <TEAM_NAME>-vpe-sg | 
 Security Group | <TEAM_NAME>-nfs-sg | 
 ACL | <TEAM_NAME>-mgmt-acl |
-Subnet | <TEAM_NAME>-vpn-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.0.0/24
-Subnet | <TEAM_NAME>-mgmt-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.1.0/24
-Subnet | <TEAM_NAME>-vpe-sn | Attach PGW, 10.<TEAM_ID_NUMBER>.2.0/24
+Subnet | <TEAM_NAME>-vpn-sn | Attach PGW, us-south-1, 10.<TEAM_ID_NUMBER>.0.0/24
+Subnet | <TEAM_NAME>-mgmt-sn | Attach PGW, us-south-1, 10.<TEAM_ID_NUMBER>.1.0/24
+Subnet | <TEAM_NAME>-vpe-sn | Attach PGW, us-south-1, 10.<TEAM_ID_NUMBER>.2.0/24
+Subnet | <TEAM_NAME>-resolver-sn | us-south-2, 10.<TEAM_ID_NUMBER>.12.0/24, for DNS custom resolver
 Reserved IP | <TEAM_NAME>-mgmt-01-rip | 10.<TEAM_ID_NUMBER>.1.4
 Reserved IP | <TEAM_NAME>-mgmt-02-rip | 10.<TEAM_ID_NUMBER>.1.5
 Virtual Network Interface | <TEAM_NAME>-mgmt-01-vni | Attach RIP
@@ -215,7 +216,7 @@ In these hands on labs we are only using one Availability Zone (AZ), when design
 
 1. In the VPC you created click **Overview**.
 2. Note the random names of the default Security Group, ACL and Route Table.
-3. Click on the ACL name one and using **Actiuns / Rename**, rename to:`<TEAM_NAME>-management-vpc-default-acl`.
+3. Click on the ACL name one and using **Actions / Rename**, rename to:`<TEAM_NAME>-management-vpc-default-acl`.
 4. For the security group and route table, click on the name and use the pencil (edit) button to change the names to:
 
    * `<TEAM_NAME>-management-vpc-default-sg`
@@ -227,7 +228,7 @@ We will learn how to create a DNS instance. IBM Cloud DNS Services provide priva
 
 ### Step 1: Create a DNS Services instance
 
-1. Open the IBM Cloud catalog page and in teh Search box type **DNS** and then select **DNS Services**.
+1. Open the IBM Cloud catalog page and in the Search box type **DNS** and then select **DNS Services**.
 2. In the **Create** tab:
  
    * **Service name**: `<TEAM_NAME>-dns-srv`
@@ -243,7 +244,7 @@ We will learn how to create a DNS instance. IBM Cloud DNS Services provide priva
 2. Click the **Create zone** button on the DNS Zones page.
 3. Enter the following:
  
-   * **Name**: team<TEAM_NUMBER>.hol.cloud e.g. `team1.hol.cloud`
+   * **Name**: team<TEAM_ID_NUMBER>.hol.cloud e.g. `team1.hol.cloud`
 
 4. Click **Create zone**
 
@@ -260,26 +261,26 @@ We will learn how to create a DNS instance. IBM Cloud DNS Services provide priva
 
 ### Step 4: Add DNS resource A records
 
-1. From the **DNS zones** table, click the zone name team<TEAM_NUMBER>.hol.cloud.
+1. From the **DNS zones** table, click the zone name team<TEAM_ID_NUMBER>.hol.cloud.
 2. Click **Select record action / Add record** to display a panel where you create the record.
 3. Select **type of record** `A`.
 4. Enter:
  
    * **Name**: `<TEAM_NAME>-mgmt-01-vsi`
-   * **IPv4 Address**: `10.<TEAM_NUMBER>.1.4`
+   * **IPv4 Address**: `10.<TEAM_ID_NUMBER>.1.4`
 
 5. Click **Save**
 6. Repeat for:
  
    * **Name**: `<TEAM_NAME>-mgmt-02-vsi`
-   * **IPv4 Address**: `10.<TEAM_NUMBER>.1.5`
+   * **IPv4 Address**: `10.<TEAM_ID_NUMBER>.1.5`
 
 ### Step 5: Add DNS resource PTR records
 
 1. Click **Add Record** to display a panel where you create the record.
 2. Select **type of record** `PTR`.
 3. Select **existing record**: `<TEAM_NAME>-mgmt-01-vsi`
-4. Repeat for` <TEAM_NAME>-mgmt-02-vsi`
+4. Repeat for `<TEAM_NAME>-mgmt-02-vsi`
 
 ## Create a public gateway
 
@@ -300,7 +301,7 @@ We will learn how to create a public gateway using the IBM Cloud UI.
 4. Enter values for the following fields under details:
 
    * Public gateway name - `<TEAM_NAME>-pgw-01-pgw`.
-   * Resource group - `<TEAM_NAME>-Management`.
+   * Resource group - `<TEAM_NAME>-management-rg`.
    * VPC - `<TEAM_NAME>-management-vpc`.
    * Tags - `env:mgmt`.
 
@@ -333,7 +334,7 @@ We will create two subnets using the UI.
    - **Virtual private cloud**: `<TEAM_NAME>-management-vpc`.
    - **IP range selection**: `10.<TEAM_ID_NUMBER>.0.0/24`.
    - **Routing table**: `<TEAM_NAME>-mgmt-rt`
-   - **Subnet access control list**: `<TEAM_NAME>-mgmt-sg`
+   - **Subnet access control list**: `<TEAM_NAME>-mgmt-acl`
    - **Public gateway**: `Attached`.
 
 5. Click **Create subnet** to create the subnet.
@@ -475,14 +476,14 @@ all \
 3. Repeat to create the security group and rules for the VPE security group:
 
    * **Security group name**: `<TEAM_NAME>-vpe-sg`
-   * **Inbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
-   * **Outbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
+   * **Inbound rule**: 10.<TEAM_ID_NUMBER>.0.0/20, ALL, ANY, ANY
+   * **Outbound rule**: 10.<TEAM_ID_NUMBER>.0.0/20, ALL, ANY, ANY
 
-4. Repeat to create the security group and rules for a the NFS security group:
+4. Repeat to create the security group and rules for the NFS security group:
 
    * **Security group name**: `<TEAM_NAME>-nfs-sg`
    * **Inbound rule**: TCP 2049, any, any
-   * **Outbound rule**: 10.<TEAM_ID>.0.0/20, ALL, ANY, ANY
+   * **Outbound rule**: 10.<TEAM_ID_NUMBER>.0.0/20, ALL, ANY, ANY
 
 5. In the UI check all security groups and their rules and correct as needed
 
@@ -524,18 +525,18 @@ For production environments, consider creating more restrictive rules that only 
    <TEAM_NAME>-mgmt-acl \
    allow \
    inbound \
-   all \
+   icmp_tcp_udp \
    0.0.0.0/0 \
    0.0.0.0/0 \
    --vpc <TEAM_NAME>-management-vpc \
    --name default-inbound-rule
 
-   # Add outbound rule to allow all traffic  
+   # Add outbound rule to allow all traffic
    ibmcloud is network-acl-rule-add \
    <TEAM_NAME>-mgmt-acl \
    allow \
    outbound \
-   all \
+   icmp_tcp_udp \
    0.0.0.0/0 \
    0.0.0.0/0 \
    --vpc <TEAM_NAME>-management-vpc \
@@ -546,7 +547,7 @@ For production environments, consider creating more restrictive rules that only 
 
 ## Create DNS Custom Resolvers
 
-### Step1: Create DNS Custom Resolvers
+### Step 1: Create DNS Custom Resolvers
 
 1. In a terminal session:
 
@@ -562,28 +563,44 @@ For production environments, consider creating more restrictive rules that only 
    echo $INSTANCE_ID
    ibmcloud dns instance-target $INSTANCE_ID
 
-   # Get the subnet CRN
-   SUBNET_CRN=$(ibmcloud is subnets --resource-group-name <TEAM_NAME>-management-rg --output json | jq -r '.[] | select(.name=="<TEAM_NAME>-vpe-sn") | .crn')
-   echo $SUBNET_CRN
+   # Custom resolvers require locations in at least two different availability zones.
+   # Create an address prefix and subnet in a second zone for the resolver.
+   ibmcloud is vpc-address-prefix-create \
+   <TEAM_NAME>-resolver-prefix \
+   <TEAM_NAME>-management-vpc \
+   us-south-2 \
+   10.<TEAM_ID_NUMBER>.12.0/24
 
-   # Create the first resolver
+   ibmcloud is subnet-create \
+   <TEAM_NAME>-resolver-sn \
+   <TEAM_NAME>-management-vpc \
+   --ipv4-cidr-block 10.<TEAM_ID_NUMBER>.12.0/24 \
+   --resource-group-name <TEAM_NAME>-management-rg
+
+   # Get the subnet CRNs for both zones
+   VPE_SUBNET_CRN=$(ibmcloud is subnets --resource-group-name <TEAM_NAME>-management-rg --output json | jq -r '.[] | select(.name=="<TEAM_NAME>-vpe-sn") | .crn')
+   RESOLVER_SUBNET_CRN=$(ibmcloud is subnets --resource-group-name <TEAM_NAME>-management-rg --output json | jq -r '.[] | select(.name=="<TEAM_NAME>-resolver-sn") | .crn')
+
+   # Create the resolver with locations in two different zones
    ibmcloud dns custom-resolver-create \
    --name "<TEAM_NAME>-custom-resolver-1" \
-   --description "First custom resolver in VPC subnet" \
-   --location $SUBNET_CRN \
-   --location $SUBNET_CRN
+   --description "Custom resolver across zones" \
+   --location $VPE_SUBNET_CRN \
+   --location $RESOLVER_SUBNET_CRN
+
+   # Wait ~60 seconds for resolver locations to become healthy
 
    # Get the resolver ID
-   RESOLVER_ID=$(ibmcloud dns custom-resolvers --output json | jq -r '.[].id' )
+   RESOLVER_ID=$(ibmcloud dns custom-resolvers --output json | jq -r '.[].id')
    echo $RESOLVER_ID
 
-   # Enable the resolver
+   # Enable the resolver (both locations must be healthy first)
    ibmcloud dns custom-resolver-update $RESOLVER_ID --enabled true
 
    # Get the IP addresses of the resolvers
    ibmcloud dns custom-resolver \
    $RESOLVER_ID \
-   --output json | jq -r '.locations.[].dns_server_ip'
+   --output json | jq -r '.locations[].dns_server_ip'
    ```
 
 2. Record the IP addresses for use in creating a VPN.
@@ -644,7 +661,7 @@ For the next VNI we will use the CLI:
 1. Using the CLI:
 
 ```bash
-rip_id=$(ibmcloud is subnet-reserved-ip team1-mgmt-sn team1-mgmt-02-rip --output json | jq -r '.id')
+rip_id=$(ibmcloud is subnet-reserved-ip <TEAM_NAME>-mgmt-sn <TEAM_NAME>-mgmt-02-rip --output json | jq -r '.id')
 echo $rip_id
 
 ibmcloud is virtual-network-interface-create \
@@ -656,7 +673,7 @@ ibmcloud is virtual-network-interface-create \
 --rip $rip_id \
 --sgs <TEAM_NAME>-mgmt-sg \
 --resource-group-name <TEAM_NAME>-management-rg \
---vpc <TEAM_NAME>-management-vpc 
+--vpc <TEAM_NAME>-management-vpc
 ```
 
 #### Notes
@@ -675,7 +692,7 @@ To create a virtual server instance in the console, follow these steps:
 1. In the IBM Cloud console, navigate to **Compute > Virtual server instances**.
 2. Click **Create** the enter the following information:
 
-   * **Gepgraphy**: `North America`
+   * **Geography**: `North America`
    * **Region**: `us-south`
    * **Zone**: `us-south-1`
    * **Name**: `<TEAM_NAME>-mgmt-01-vsi`
@@ -683,7 +700,7 @@ To create a virtual server instance in the console, follow these steps:
    * **Tags**: `env:mgmt` and `backup:yes`
 
 3. Click on **Change image**
-4. Scroll down, select **ibm-ubuntu-24-04-2-minimal-amd64-2** and click **Save**.
+4. Scroll down, select **ibm-ubuntu-24-04-4-minimal-amd64-2** and click **Save**.
 5. Click on **Change profile**
 6. Select **By Scenario** and then select **Web Development and Test**.
 7. Click on **bx2-2x8** and then click **Save**.
@@ -709,7 +726,7 @@ us-south-1 \
 bx2-2x8 \
 <TEAM_NAME>-mgmt-sn \
 --pnac-vni <TEAM_NAME>-mgmt-02-vni \
---image ibm-windows-server-2022-full-standard-amd64-25 \
+--image ibm-windows-server-2022-full-standard-amd64-35 \
 --keys <TEAM_NAME>-ssh-key-1 \
 --resource-group-name <TEAM_NAME>-management-rg \
 --user-data @<FULL_PATH>/mgmt-02-vsi.init

@@ -1,4 +1,4 @@
-## HOL9 - IBM Cloud Identity and Access Management
+# Hands-on Lab 9: IBM Cloud Identity and Access Management (120 mins)
 
 What you will learn:
 
@@ -6,141 +6,247 @@ What you will learn:
 * Manage users, access groups, roles, and policies through all interfaces
 * Create service identities, generate API keys, and configure automation access
 * Monitor IAM activities via Activity Tracker
-* Set up federated identity and trusted profiles for workload access
+* Set up trusted profiles for workload access
 * Simulate IAM security scenarios using multiple access paths
 
-✅ Module 1: IAM Overview & Interface Setup (10 mins)
+## Resources that will be deployed in this HOL
 
-Objectives:
+Resource Type | Name | Notes
+---------|----------|---------
+Access Group | <TEAM_NAME>-DevOps |
+Service ID | <TEAM_NAME>-app-automation |
+API Key | <TEAM_NAME>-auto-key |
+Trusted Profile | <TEAM_NAME>-K8sAccess |
+
+This document references:
+
+- `<TEAM_NAME>` this is your team name e.g. `team-1`
+
+## Module 1: IAM Overview & Interface Setup (10 mins)
+
+### Objectives
 
 * Understand the IAM model and supported interfaces
-* Set up CLI and prepare REST tools (Postman or curl)
+* Set up CLI and prepare REST tools
 
-Tasks:
+### Tasks
 
-* Log in to IBM Cloud Console (UI)
-* Install and configure IBM Cloud CLI
-* Set up Postman or curl with IAM token-based authentication
+1. Log in to IBM Cloud Console (UI) at https://cloud.ibm.com.
+2. In a terminal session, log in via CLI:
 
-✅ Module 2: User Management (20 mins)
+```bash
+ibmcloud login --sso
+ibmcloud target -r us-south -g <TEAM_NAME>-services-rg
+```
 
-Objectives:
+3. Generate an IAM token for REST API calls:
+
+```bash
+IAM_TOKEN=$(ibmcloud iam oauth-tokens | awk '/IAM/{print $NF}')
+echo $IAM_TOKEN
+```
+
+4. Test the token with a curl command:
+
+```bash
+curl -s -X GET "https://iam.cloud.ibm.com/v2/groups?account_id=$(ibmcloud account show --output json | jq -r '.account_id')" \
+  -H "Authorization: Bearer $IAM_TOKEN" | jq '.groups | length'
+```
+
+## Module 2: User Management (20 mins)
+
+### Objectives
 
 * Manage user invitations and role assignments via UI, CLI, and REST
 
-Tasks:
+### Tasks
 
-* UI: Invite a new user, assign Viewer role
-* CLI:
+1. **UI**: Navigate to **Manage > Access (IAM) > Users**. Review the users in the account. Note the different access policies assigned.
+
+2. **CLI**: Invite a new user (use a test email address):
+
 ```bash
-ibmcloud account user-invite user@example.com --role Viewer
+ibmcloud account user-invite user@example.com
 ```
-* REST:
-Send POST to /v1/invites with user email and roles
-* Revoke user and verify access removal using Activity Tracker (UI)
 
-✅ Module 3: Access Groups & IAM Policies (20 mins)
+3. **CLI**: List users in the account:
 
-Objectives:
+```bash
+ibmcloud account users --output json | jq '.[].email'
+```
+
+4. **REST API**: List users using curl:
+
+```bash
+ACCOUNT_ID=$(ibmcloud account show --output json | jq -r '.account_id')
+curl -s -X GET "https://user-management.cloud.ibm.com/v2/accounts/$ACCOUNT_ID/users" \
+  -H "Authorization: Bearer $IAM_TOKEN" | jq '.resources[] | {email: .email, state: .state}'
+```
+
+5. **UI**: Navigate to **Activity Tracker** (Cloud Logs) and filter for IAM events to see the invite action.
+
+## Module 3: Access Groups & IAM Policies (20 mins)
+
+### Objectives
 
 * Create access groups and assign policies
 
-Tasks:
+### Tasks
 
-* UI:
-    * Create group "DevOps Team"
-    * Add members and assign Viewer + Editor roles
+1. **UI**: Navigate to **Manage > Access (IAM) > Access groups**. Create a group named `<TEAM_NAME>-DevOps`.
 
-* CLI:
+2. **CLI alternative**:
+
+```bash
+# Create access group
+ibmcloud iam access-group-create "<TEAM_NAME>-DevOps" -d "DevOps Team"
+
+# Add a policy granting Viewer and Editor on Cloud Object Storage
+ibmcloud iam access-group-policy-create "<TEAM_NAME>-DevOps" \
+  --roles Viewer,Editor \
+  --service-name cloud-object-storage
+
+# List policies for the group
+ibmcloud iam access-group-policies "<TEAM_NAME>-DevOps"
 ```
-ibmcloud iam access-group-create "DevOps Team"
-ibmcloud iam access-group-policy-create "DevOps Team" --roles Viewer,Editor --service-name cloud-object-storage
+
+3. **REST API**: List access groups using curl:
+
+```bash
+ACCOUNT_ID=$(ibmcloud account show --output json | jq -r '.account_id')
+curl -s -X GET "https://iam.cloud.ibm.com/v2/groups?account_id=$ACCOUNT_ID" \
+  -H "Authorization: Bearer $IAM_TOKEN" | jq '.groups[] | {name: .name, id: .id}'
 ```
-* REST:
-    * Use POST /v2/groups to create group
-    * Use POST /v1/policies to attach policy
 
-✅ Module 4: Service IDs and API Keys (15 mins)
+## Module 4: Service IDs and API Keys (15 mins)
 
-Objectives:
+### Objectives
 
-* Automate access with service IDs and keys
+* Automate access with service IDs and API keys
 
-Tasks:
+### Tasks
 
-* UI:
-    * Create Service ID for automation
-    * Generate and download API Key
+1. **UI**: Navigate to **Manage > Access (IAM) > Service IDs**. Review the existing service IDs.
 
-* CLI:
+2. **CLI**: Create a service ID and generate an API key:
 
+```bash
+# Create a service ID for automation
+ibmcloud iam service-id-create <TEAM_NAME>-app-automation -d "Automation service ID"
+
+# Generate an API key for the service ID
+ibmcloud iam service-api-key-create <TEAM_NAME>-auto-key <TEAM_NAME>-app-automation \
+  -d "Automation API key"
 ```
-ibmcloud iam service-id-create app-automation
-ibmcloud iam service-api-key-create key1 app-automation
+
+**Important**: Save the API key value — it cannot be retrieved after creation.
+
+3. **CLI**: Add a policy to the service ID:
+
+```bash
+ibmcloud iam service-policy-create <TEAM_NAME>-app-automation \
+  --roles Viewer \
+  --service-name cloud-object-storage
 ```
-* REST:
-    * Use POST /v1/serviceids and POST /v1/apikeys
 
-✅ Module 5: Activity Tracker and IAM Logs (10 mins)
+4. **CLI**: Test the service ID API key by logging in:
 
-Objectives:
+```bash
+ibmcloud login --apikey <SERVICE_API_KEY> -r us-south
+ibmcloud resource groups
+```
+
+## Module 5: Activity Tracker and IAM Logs (10 mins)
+
+### Objectives
 
 * Monitor IAM activity across interfaces
 
-Tasks:
+### Tasks
 
-* UI:
-
-    * Open Activity Tracker, filter IAM events
-
-✅ Module 6: Trusted Profiles and Identity Federation (25 mins)
-
-Objectives:
-
-* Configure trusted profile for workload identity
-* Connect federated IdP (SAML/OIDC)
-
-Tasks:
-
-* UI:
-    * Create Trusted Profile “K8sAccess”
-    * Add compute resource link
-    * Assign access policies
-
-* CLI:
-```
-ibmcloud iam trusted-profile-create K8sAccess --description "Kubernetes Access Profile"
-ibmcloud iam trusted-profile-policy-create K8sAccess --roles Viewer --service-name cloud-object-storage
-```
-* REST:
-    * Use POST /v1/profiles and POST /v1/policies
-
-✅ Module 7: Advanced IAM Scenarios (15 mins)
-
-Objectives:
-
-* Create conditional, time-based, and scoped policies
-* Disable public access group
-
-Tasks:
-
-* UI:
-    * Create policy valid for 1 hour
-    * Disable "public access group" in IAM settings
-
-* CLI:
+1. Navigate to your Cloud Logs instance dashboard.
+2. In **Explore Logs**, search for IAM events using the Lucene query:
 
 ```
-ibmcloud iam policy-create <subject> --roles Viewer --service-name cloud-object-storage --condition expiration="1h"
-ibmcloud account-settings-update --disable-public-access-group true
+action:"iam-identity*" OR action:"iam-groups*"
 ```
 
-* REST:
-    * Use POST /v1/policies with conditions
-    * Update account settings via PATCH /v1/account_settings
+3. Review the events generated by your actions in Modules 2-4.
+4. Create a view named `<TEAM_NAME>-IAM-Events` to save this filter.
 
-✅ Wrap-Up and Q&A (5 mins)
+## Module 6: Trusted Profiles (25 mins)
 
-* Recap differences between UI, CLI, and REST API
+### Objectives
+
+* Configure trusted profiles for workload identity
+
+### Tasks
+
+1. **UI**: Navigate to **Manage > Access (IAM) > Trusted profiles**. Create a profile named `<TEAM_NAME>-K8sAccess`.
+
+2. **CLI alternative**:
+
+```bash
+# Create a trusted profile
+ibmcloud iam trusted-profile-create <TEAM_NAME>-K8sAccess \
+  -d "Workload access profile"
+
+# Add a policy to the trusted profile
+ibmcloud iam trusted-profile-policy-create <TEAM_NAME>-K8sAccess \
+  --roles Viewer \
+  --service-name cloud-object-storage
+
+# List trusted profiles
+ibmcloud iam trusted-profiles
+```
+
+3. **UI**: Add a compute resource link to the trusted profile to allow VPC VSIs to assume the profile.
+
+4. **VM Authentication**: If metadata service is enabled on a VSI, test workload identity authentication using the steps in [Scripts/HOL9/vm_authentication.md](../Scripts/HOL9/vm_authentication.md).
+
+## Module 7: Advanced IAM Scenarios (15 mins)
+
+### Objectives
+
+* Explore account settings and security controls
+
+### Tasks
+
+1. **CLI**: Review current account IAM settings:
+
+```bash
+ibmcloud iam account-settings --output json | jq '{mfa: .mfa, restrict_create_service_id: .restrict_create_service_id, restrict_create_platform_apikey: .restrict_create_platform_apikey, session_expiration_in_seconds: .session_expiration_in_seconds}'
+```
+
+2. **CLI**: Update an account setting (example — restrict service ID creation):
+
+```bash
+ibmcloud iam account-settings-update --restrict-create-service-id RESTRICTED
+```
+
+3. **UI**: Navigate to **Manage > Access (IAM) > Settings**. Review:
+   * IP address access restrictions
+   * MFA settings
+   * Session duration settings
+   * Public access settings
+
+4. **Discussion**: When would you use each of these controls?
+
+## Wrap-Up and Q&A (5 mins)
+
+* Recap differences between UI, CLI, and REST API for IAM operations
 * Tips for choosing the right interface (automation vs. usability)
 * Discuss IAM troubleshooting and best practices
+
+## Questions
+
+1. What is the difference between an access group and a trusted profile in IBM Cloud IAM?
+2. What are the key components of an IAM access policy (subject, role, resource)?
+3. When should you use a service ID versus a trusted profile for workload identity?
+4. What is the purpose of the public access group, and when should it be disabled?
+5. How does IBM Cloud IAM enforce the principle of least privilege?
+6. What are the different types of MFA available in IBM Cloud, and when would you use each?
+7. How can you use Activity Tracker to audit IAM changes in your account?
+8. What is the difference between platform roles and service roles in IBM Cloud IAM?
+9. How do IP address restrictions in IAM settings affect API key usage?
+10. Describe how you would set up automated access for a CI/CD pipeline using IBM Cloud IAM.

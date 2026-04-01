@@ -77,26 +77,58 @@ In this HOL we will:
 * **Tags**: `env:mgmt`
 * **Enable Cloud Security Posture Management (CSPM) for your IBM Cloud account**: Disabled
 
-We have disabled **Cloud Security Posture Management** in this hands on lab so that we can focus on the workload protection features. If you have time at the end of this lab then enable CSPM and investigate it's features.
+We have disabled **Cloud Security Posture Management** in this hands on lab so that we can focus on the workload protection features. If you have time at the end of this lab then enable CSPM and investigate its features.
+
+**CLI alternative:**
+
+```bash
+# Provision the instance
+ibmcloud target -g <TEAM_NAME>-services-rg
+ibmcloud resource service-instance-create <TEAM_NAME>-scc-wp-svc sysdig-secure free-trial us-south \
+  -g <TEAM_NAME>-services-rg
+
+# Create a service key to get the access key and collector endpoint
+ibmcloud resource service-key-create <TEAM_NAME>-wp-key Manager \
+  --instance-name <TEAM_NAME>-scc-wp-svc
+
+# Note the "Sysdig Access Key" and "Sysdig Collector Endpoint" from the output
+```
 
 ### Step 2: Install a Workload Protection Agent for Linux
 
-1. On the Workload Protection instance page, click Sources then Linux.
-2. Note the commandline instructions to install via the provate endpoint.
-3. Via the VPN, SSH to <TEAM_NAME>-mgmt-01-vsi.
-4. Using the commandline noted earlier install the Agent
+1. On the Workload Protection instance page, click **Sources** then **Linux**.
+2. Note the command line instructions to install via the private endpoint.
+3. Via the VPN, SSH to `<TEAM_NAME>-mgmt-01-vsi`.
+4. Using the command line noted earlier, install the agent.
+
+**CLI alternative:**
+
+Using the access key and collector endpoint from Step 1, SSH to the management VSI and install the agent:
+
+```bash
+# SSH to the management VSI (use ubuntu user for Ubuntu images)
+ssh -i ~/.ssh/hol-key ubuntu@<FLOATING_IP_FOR_mgmt-01-vsi>
+
+# Install the agent using the private collector endpoint
+curl -sL https://ibm.biz/install-sysdig-agent | sudo bash -s -- \
+  --access_key <ACCESS_KEY> \
+  --collector ingest.private.us-south.security-compliance-secure.cloud.ibm.com \
+  --collector_port 6443 \
+  --secure true \
+  --tags env:mgmt
+```
 
 
 ## Verify the Agent Connection and Status
 
 ### Step 1: Verify the configuration
 
-1. SSH to the Linux VM yo installed the agent on,
+1. SSH to the Linux VM you installed the agent on,
 2. Use the following command to review the agent configuration `cat /opt/draios/etc/dragent.yaml`.
 
 ### Step 2: Verify Agent Status
 
-1. Use one of the followin commands `service dragent status` or `systemctl status dragent` to see that the agent is `enabled` and `active`.
+1. Use one of the following commands `service dragent status` or `systemctl status dragent` to see that the agent is `enabled` and `active`.
 2. Use `ps -ef | grep sysdig` to see that the agent process is running
 
 ### Step 3: Verifying results in the UI
@@ -125,7 +157,7 @@ Compliance results will be shown within a few minutes of installation and scans 
 
 1. Navigate to **Compliance / Overview** in the Workload Protection UI.
 2. As we have not setup any Zones the Agents will have been placed into the `Entire Infrastructure` zone.
-3. In the `Select Zones` select `Entire Infrastructure` and in `Selct policies` select `CIS Distribution Independent Linux`.
+3. In the `Select Zones` select `Entire Infrastructure` and in `Select policies` select `CIS Distribution Independent Linux`.
 4. Select a Policy, **CIS Linux Benchmark**.
 5. Select `3.2.2 Ensure ICMP redirects are not accepted (Scored)`.
 6. Select `Show Results` next to `sysctl reports appropriate net.ipv4.conf.default.accept_source`
@@ -151,7 +183,7 @@ Workload Protection instruments Linux hosts via eBPF to inspect all system activ
 
 In this demo scenario we will simulate an attack.
 
-1. Navigate to **Policies / Threat Destection / Runtime Policies**.
+1. Navigate to **Policies / Threat Detection / Runtime Policies**.
 2. Review the policies that are available, and those that are enabled. The policies applicable to Linux are under **Workload**.
 3. Under **Workload**, select the policy **Sysdig Runtime Threat Detection** and review the rules.
 4. Now select **Sysdig Runtime Threat Intelligence**, scroll to **Malicious filenames written** and open the tab.
@@ -172,8 +204,8 @@ When a policy for preemptive blocking is configured, attempts to execute a black
 * Run `ncat` and see that it is blocked.
 
 1. In an SSH session on the Linux management VSI,enter `sudo apt install ncat -y`.
-2. Once installed run `netcat -lvp 9999`. You should see `Listening on 0.0.0.0 9999`
-3. Stop the process with `cntrl + c`.
+2. Once installed run `ncat -lvp 9999`. You should see `Ncat: Listening on 0.0.0.0:9999`
+3. Stop the process with `Ctrl + C`.
 4. Via the Workload Protection UI navigate to **Policies / Rules Library / Rules**.
 5. Click **Add Rule / Workload**.
 6. In the form enter the following and then **Save**:
@@ -185,7 +217,7 @@ When a policy for preemptive blocking is configured, attempts to execute a black
       * **Tags**: `network, blocking`
 7. Select **Policies / Threat Detection / Runtime Policies**.
 8. Click **Add Policy**, and select **Workload**.
-9. In the form enter the following abd then **Save**:
+9. In the form enter the following and then **Save**:
       * **Name**: `Demo Policy`
       * **Description**: `My demo policy`
       * **Severity**: `High`
@@ -193,7 +225,7 @@ When a policy for preemptive blocking is configured, attempts to execute a black
       * **Policy Rules**: Use the Import from Library button and then search using `Block ncat usage`
       * **Kill Process**: Enabled
 10. Wait a few minutes for the policy to be synchronized to the agent.
-11. In the SSH session with the Linux management VSI, run `netcat -lvp 9999`. This time the process should be blocked with `Listening on 0.0.0.0 9999 Killed`
+11. In the SSH session with the Linux management VSI, run `ncat -lvp 9999`. This time the process should be blocked and killed.
 
 If you still have time in the hands on lab:
 

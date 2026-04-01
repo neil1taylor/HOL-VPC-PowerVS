@@ -19,14 +19,15 @@
 ## Resources that will be deployed in this HOL
 In this HOL, you will deploy the following:
 
-Resource Type |
---------------|
-Importing Custom OS image as HANA / NW image
-SAP PowerVS HANA instance sh2-4x256
-SAP PowerVS Application server instance sr2-2x32
-OS tuning for SAP using ansible roles
-Cloud object storage instance plus bucket
-HANA Backint agent
+Resource Type | Name | Notes
+---------|----------|---------
+Custom OS Image | RHEL for SAP | Optional, skipped in lab
+SAP HANA Instance | <TEAM_NAME>-hana-vsi | Profile sh2-4x256, s1022
+SAP Application Instance | <TEAM_NAME>-app-vsi | Profile sr2-2x32, s1022
+Cloud Object Storage | <TEAM_NAME>-hana-cos | For HANA backups
+COS Bucket | <TEAM_NAME>-hana-backup | Smart tier, versioning enabled
+Custom IAM Role | HanaBackup | 15 COS permissions
+Service ID | <TEAM_NAME>-hana-backup-sid | Limited to backup bucket
 
 ### Step 1: Importing Custom OS image for deploying SAP instance (Optional. Will be skipped in the lab)
 **Using UI**
@@ -65,12 +66,12 @@ resource "ibm_pi_image" "pi_custom_image1" {
   pi_image_bucket_access    = "private"
   pi_image_bucket_region    = "us-east"
   pi_image_bucket_file_name = "my-os-image-file.ova.gz"
-  pi_image_storage_type     = "tier0", "tier1", "tier3", "tier5k"
+  pi_image_storage_type     = "tier3"  # One of: "tier0", "tier1", "tier3", "tier5k"
   pi_image_access_key       = "my-cos-bucket-access-key"
   pi_image_secret_key       = "my-cos-bucket-secret-key"
   pi_image_import_details   = {
       license_type = "byol"
-      product      = "Hana" or "Netweaver"
+      product      = "Hana"  # or "Netweaver"
       vendor       = "SAP"
     }
 }
@@ -86,10 +87,10 @@ curl -X POST https://us-east.power-iaas.cloud.ibm.com/pcloud/v1/cloud-instances/
         "bucketName": "my-cos-bucket-name",
         "accessKey": "my-cos-bucket-access-key",
         "secretKey": "my-cos-bucket-secret-key",
-        "storageType": "tier3"
+        "storageType": "tier3",
         "importDetails": {
-        "licenseType": "byol"
-        "product": "Hana"
+        "licenseType": "byol",
+        "product": "Hana",
         "vendor": "SAP"
     }
       }'
@@ -129,11 +130,11 @@ ibmcloud pi subnet list
 # list available images
 ibmcloud pi image ls
 
-# list stock catalog images with sap images
-ibmcloud pi image lc --sap
+# list stock catalog images
+ibmcloud pi image lc
 
 # create SAP HANA instance
-ibmcloud pi instance sap create <name> --key-name <key_name> --image <IMAGE_id> --profile-id <PROFILE_ID> --subnets "" --volumes ""
+ibmcloud pi instance sap create <name> --key-name <key_name> --image <IMAGE_id> --profile-id <PROFILE_ID> --subnets "<SUBNET_ID>"
 ```
 
 **Using Terraform:**
@@ -170,7 +171,7 @@ curl  -X POST \
       "networkID": "{network_id}"
     }
   ],
-  "profileID": "sr2-4x256",
+  "profileID": "sh2-4x256",
   "sshKeyName": "key_name",
   "storageType": "tier0",
   "volumeIDs": []
@@ -201,7 +202,7 @@ The SAP Application Server profiles are not available over UI. However we can cr
 Terraform, API and CLI are same as HANA instance deployment.
 
 
-### Step4: Filesystem creation and Tuning OS for SAP
+### Step 4: Filesystem creation and Tuning OS for SAP
 
 Login using ssh private key to the SAP Power instance. `ssh root@private_ip`
 
@@ -332,7 +333,7 @@ setup/hcmt -v -p config/full_executionplan.json # to execute the tests using a c
 **Create IBM Cloud Object Storage Instance**
 1. Click ☰ infrastructure > Storage > Object Storage.
 1. Create an instance
-    - **Plan**: Standarad
+    - **Plan**: Standard
     - **Service Name**: my-cos-instance
     - **Resource group**: Pick any
 1. Click Create.
@@ -395,3 +396,16 @@ Create a Service ID having the custom role access as above and limiting the acce
 1. Click Assign
 1. Now switch to the API keys tab inside the service ID and create an API Key.
 1. Save this key for backup operations.
+
+## Questions
+
+1. What are the key differences between SAP HANA certified profiles (sh2) and SAP Application Server profiles (sr2) on IBM Power Virtual Server?
+2. Why is it important to check the NUMA layout before running SAP HANA, and what does the `chk_numa_lpm.py` script verify?
+3. What is the purpose of striping across multiple volumes when creating filesystems for SAP HANA data and log?
+4. Explain the role of RHEL System Roles for SAP (Ansible roles) in preparing an operating system for SAP workloads.
+5. What is the HCMT benchmark tool and what performance metrics does it measure for SAP HANA infrastructure?
+6. Why should you use a custom IAM role with limited permissions for HANA BACKINT operations instead of a standard Manager or Writer role?
+7. What storage tiers are recommended for SAP HANA log volumes versus data volumes, and why?
+8. How does IBM Cloud Object Storage versioning support SAP HANA backup and recovery scenarios?
+9. What is the difference between importing a custom OS image and using an IBM-provided subscription image for SAP on PowerVS?
+10. Describe the end-to-end process of setting up SAP HANA backup to Cloud Object Storage using the BACKINT agent.

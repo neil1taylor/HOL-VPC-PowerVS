@@ -8,6 +8,8 @@ What you will learn:
 
 ## Prerequisites
 
+* Completion of HOL1 (VPC), HOL2 (VPN), and HOL4 (PowerVS).
+
 ## Overview
 
 With IBM Cloud Transit Gateway, you can create single or multiple transit gateways to inter-connect IBM Cloud infrastructure environments. IBM Cloud Transit Gateway is a fully redundant, fault-tolerant service with no single point of failure within IBM Cloud Multi-Zone Regions (MZR). Transit Gateway is a regional service that employs routers located in each Availability Zone.
@@ -48,7 +50,7 @@ This document references:
 ibmcloud plugin install tg
 
 # Get the resource group ID
-resource_group_id=$(ibmcloud resource group <TEAM_NAME>-services-rg --output JSON | jq -r '.[].id')
+resource_group_id=$(ibmcloud resource group <TEAM_NAME>-services-rg --output JSON | jq -r '.[0].id')
 
 # Create a local transit gateway
 ibmcloud tg gateway-create \
@@ -80,24 +82,24 @@ ibmcloud tg gateway-create \
         v
     [ Bastion Host ]  ---> SSH to  --->  [ Internal Server ]
     ```
-    by using `ssh -i ~/.ssh/hol-key -J root@<FLOATING_IP_FOR_mgmt-01-vsi> root@10.<TEAM_ID>.8.2`.
+    by using `ssh -i ~/.ssh/hol-key -J ubuntu@<FLOATING_IP_FOR_mgmt-01-vsi> root@10.<TEAM_ID_NUMBER>.8.2`.
 
 5. Once connected to the PowerVSI issue the command `ip route`.
-6. Ping the management host; `ping <TEAM_NAME>-mgmt-01-vsi.<TEAM_NAME>.hol.cloud`. Why does this fail? Is the name resolution response allowed through the the PowerVS Network Security Group? DNS uses UDP port 53, and the custom resolvers are on the VPE subnet. Add a rule to allow UDP source port 53 to all destination ports in the NSG that has the PowerVS VSI as a member.
+6. Ping the management host; `ping <TEAM_NAME>-mgmt-01-vsi.team<TEAM_ID_NUMBER>.hol.cloud`. Why does this fail? Is the name resolution response allowed through the the PowerVS Network Security Group? DNS uses UDP port 53, and the custom resolvers are on the VPE subnet. Add a rule to allow UDP source port 53 to all destination ports in the NSG that has the PowerVS VSI as a member.
 7. Ping externally; `ping google.com`. Why does the name resolve but the ping fail? Is it because the PowerVS VSI has no access to the Internet?
 8. Review the routes, and end the SSH session by typing `exit`.
 9. Try connecting directly via the VPN using the FQDN of the PowerVSI server.
 
 **NOTE** If you have problems connecting to the PowerVS VSI via the bastion try the following:
 
-`ssh -A -o ServerAliveInterval=60 -o ServerAliveCountMax=600 -o ProxyCommand="ssh -W %h:%p root@<FLOATING_IP_FOR_mgmt-01-vsi> -i ~/.ssh/hol-key" root@10.<TEAM_ID>.8.2 -i ~/.ssh/hol-key`
+`ssh -A -o ServerAliveInterval=60 -o ServerAliveCountMax=600 -o ProxyCommand="ssh -W %h:%p ubuntu@<FLOATING_IP_FOR_mgmt-01-vsi> -i ~/.ssh/hol-key" root@10.<TEAM_ID_NUMBER>.8.2 -i ~/.ssh/hol-key`
 
-The final target of the command `root@10.<TEAM_ID>.8.2`
+The final target of the command `root@10.<TEAM_ID_NUMBER>.8.2`
 
 * `-A` (Agent Forwarding) - Forwards your local SSH agent to the remote server, allowing you to use your local SSH keys on the remote machine without copying them there.
 * `-o ServerAliveInterval=60` - Sends a keep-alive message every 60 seconds to prevent the connection from timing out
 * `-o ServerAliveCountMax=600` - Allows up to 600 unanswered keep-alive messages before disconnecting (that's 10 hours of potential downtime)
-* `ProxyCommand="ssh -W %h:%p root@<FLOATING_IP_FOR_mgmt-01-vsi> -i ~/.ssh/hol-key"` - This creates a tunnel through an intermediate server. First connects to `root@<FLOATING_IP_FOR_mgmt-01-vsi>` (the jump host with a public IP). `-W %h:%p tells the jump host to forward the connection to the final destination (%h = hostname, %p = port)`
+* `ProxyCommand="ssh -W %h:%p ubuntu@<FLOATING_IP_FOR_mgmt-01-vsi> -i ~/.ssh/hol-key"` - This creates a tunnel through an intermediate server. First connects to `ubuntu@<FLOATING_IP_FOR_mgmt-01-vsi>` (the jump host with a public IP). `-W %h:%p tells the jump host to forward the connection to the final destination (%h = hostname, %p = port)`
 
 ### Step 5: Troubleshooting
 
@@ -116,7 +118,7 @@ You will have noticed that the PowerVS does not have access to the Internet. We 
 
 1. Install Squid on `<TEAM_NAME>-mgmt-01-vsi` using `apt install squid -y`.
 2. Use the command `curl -I -x localhost:3128 https://google.com` to see that the configuration is correct. You should see `HTTP/1.1 200 Connection established`.
-3. In the VPC security group attached to `<TEAM_NAME>-mgmt-01-vsi`, allow inbound TCP port 3128 to `10.<TEAM_ID>.1.4` from CIDR `10.<TEAM_ID>.8.0/24`.
+3. In the VPC security group attached to `<TEAM_NAME>-mgmt-01-vsi`, allow inbound TCP port 3128 to `10.<TEAM_ID_NUMBER>.1.4` from CIDR `10.<TEAM_ID_NUMBER>.8.0/24`.
 4. By default, only the localhost can access the proxy so use the following commands to allow the predefined `localnet acl` access control. The `localnet acl` includes `10.0.0.0/8`:
 
    ```bash
@@ -130,10 +132,10 @@ You will have noticed that the PowerVS does not have access to the Internet. We 
       1. Open a terminal, use vi to modify the file `~/.bash_profile`, replacing <proxy_ip_address> and <proxy_port> with the actual values of your proxy server: 
 
       ```bash
-      export http_proxy=http://10.<TEAM_ID>.1.4:3128
-      export https_proxy=http://10.<TEAM_ID>.1.4:3128
-      export HTTP_PROXY=http://10.<TEAM_ID>.1.4:3128
-      export HTTPS_PROXY=http://10.<TEAM_ID>.1.4:3128
+      export http_proxy=http://10.<TEAM_ID_NUMBER>.1.4:3128
+      export https_proxy=http://10.<TEAM_ID_NUMBER>.1.4:3128
+      export HTTP_PROXY=http://10.<TEAM_ID_NUMBER>.1.4:3128
+      export HTTPS_PROXY=http://10.<TEAM_ID_NUMBER>.1.4:3128
       export no_proxy=161.0.0.0/0,10.0.0.0/8
       ```
 

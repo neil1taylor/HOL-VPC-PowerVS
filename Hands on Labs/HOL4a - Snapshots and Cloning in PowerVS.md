@@ -75,12 +75,12 @@ On Day 7, you take a second snapshot.
 1. Unfreeze DB
     - `hdbsql -u SYSTEM -p ***** -i <SID> 'BACKUP DATA FOR FULL SYSTEM CLOSE SNAPSHOT'`
 
-## LAB Performing snapshot and restore
+## LAB: Performing Snapshot and Restore
 1. To take a snapshot
 ```
-ic pi instance snapshot create INSTANCE_ID --name day1 --volumes "ID1,ID2,ID3"
+ibmcloud pi instance snapshot create INSTANCE_ID --name day1 --volumes "ID1,ID2,ID3"
 
-ic pi instance snapshot create  b01250a0-f78f-4cd5-bd91-ad1f7f3090aa --name day1 --volumes 029ba901-8a9d-4d63-92e2-17ce7cff1ea4
+ibmcloud pi instance snapshot create  b01250a0-f78f-4cd5-bd91-ad1f7f3090aa --name day1 --volumes 029ba901-8a9d-4d63-92e2-17ce7cff1ea4
 Creating snapshot for instance b01250a0-f78f-4cd5-bd91-ad1f7f3090aa under account SAP-Training-India as user Suraj.Bharadwaj@ibm.com...
 OK
 Snapshot day1 with ID of 57ab48d5-2b1a-4640-9533-4aec671ce739 has started.
@@ -88,7 +88,7 @@ Snapshot day1 with ID of 57ab48d5-2b1a-4640-9533-4aec671ce739 has started.
 
 1. List the snapshots and track status of operation
 ```
-ic pi instance snapshot list --json
+ibmcloud pi instance snapshot list --json
 {
     "snapshots": [
         {
@@ -112,7 +112,7 @@ ic pi instance snapshot list --json
 1. Day3 restore the snapshot
 Shutdown VM:
 ```
-ic  pi instance snapshot restore INSTANCE_ID --snapshot DAY1_SNAPSHOT_ID
+ibmcloud pi instance snapshot restore INSTANCE_ID --snapshot DAY1_SNAPSHOT_ID
 ```
 
 # How Cloning Works (Step-by-Step)
@@ -133,7 +133,7 @@ ic  pi instance snapshot restore INSTANCE_ID --snapshot DAY1_SNAPSHOT_ID
 * At least one volume must be “in-use”
 * Volumes must belong to same storage pool
 * Applications must be quiesced to ensure consistency
-* Command: `ibmcloud pi volume clone create --name <clone-name> --volume-ids <id1,id2,...>`
+* Command: `ibmcloud pi volume clone create --name <clone-name> --volumes <id1,id2,...>`
 
 **Statuses:**
 1. preparing → snapshot in progress
@@ -145,7 +145,7 @@ ic  pi instance snapshot restore INSTANCE_ID --snapshot DAY1_SNAPSHOT_ID
 
 This is where PowerVS uses FlashCopy to quickly initialize copy-on-write maps between source and target volumes.
 
-**Command:** `ibmcloud pi volume clone start --volume-clones-id <clone-id>`
+**Command:** `ibmcloud pi volume clone start <clone-id>`
 
 **Status:**
 1. starting → initializing copy
@@ -157,7 +157,7 @@ This is where PowerVS uses FlashCopy to quickly initialize copy-on-write maps be
 
 This step involves background copying of all blocks from source to target. Once complete, new volumes are independent.
 
-**Command:** `ibmcloud pi volume clone execute --volume-clones-id <clone-id> --name <base-name-for-new-volumes>`
+**Command:** `ibmcloud pi volume clone execute <clone-id> --name <base-name-for-new-volumes>`
 
 **Optional flags:**
 
@@ -174,21 +174,21 @@ This step involves background copying of all blocks from source to target. Once 
 ## Single Volume Clone (Fast Track)
 - If cloning only one volume, you can bypass the group prepare/start/execute:
 
-`ibmcloud pi volume clone-async --volume-id <id> --name <clone-name>`
+`ibmcloud pi volume clone-async create <clone-name> --volumes <id>`
 
 ## Cancel a Clone (If Needed)
 If cloning fails or is no longer needed, you can cancel it:
 
-`ibmcloud pi volume clone cancel --volume-clones-id <clone-id> --force true`
+`ibmcloud pi volume clone cancel <clone-id> --force`
 
 ## Delete a Clone Request
 After clone is completed, failed, or cancelled, you can delete the request metadata:
 
-`ibmcloud pi volume clone delete --volume-clones-id <clone-id>`
+`ibmcloud pi volume clone delete <clone-id>`
 
 ## Monitor Status
 
-- Get status of a specific clone: `ibmcloud pi volume clone get --volume-clones-id <clone-id>`
+- Get status of a specific clone: `ibmcloud pi volume clone get <clone-id>`
 - List all clone requests: `ibmcloud pi volume clone list --filter <status>`
 
 ## Important Technical Considerations
@@ -215,12 +215,12 @@ After clone is completed, failed, or cancelled, you can delete the request metad
 ## Hands on
 1. Clone of single disk
 ```
-ic pi volume clone-async create shared --volumes 029ba901-8a9d-4d63-92e2-17ce7cff1ea4
+ibmcloud pi volume clone-async create shared --volumes 029ba901-8a9d-4d63-92e2-17ce7cff1ea4
 ```
 
 1. Tracked the status using
 ```
-ic pi volume fcm 029ba901-8a9d-4d63-92e2-17ce7cff1ea4
+ibmcloud pi volume fcm 029ba901-8a9d-4d63-92e2-17ce7cff1ea4
 Getting the flash copy mapping for volume 029ba901-8a9d-4d63-92e2-17ce7cff1ea4 under account SAP-Training-India as user Suraj.Bharadwaj@ibm.com...
 Flash Copy Name   Source Volume Name            Target Volume Name                        Status    Start Time                 Copy Rate   Progress
 fcmap2            volume-data-1-029ba901-8a9d   volume-clone-shared-20044-e9f5588e-f6c3   copying   0001-01-01T00:00:00.000Z   140         0

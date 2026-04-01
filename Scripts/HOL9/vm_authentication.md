@@ -1,9 +1,9 @@
-## Step 1: Generate Instance IDentity token
+## Step 1: Generate Instance Identity Token
 ```
 instance_identity_token=`curl -X PUT https://api.metadata.cloud.ibm.com/instance_identity/v1/token?version=2022-08-08 -H "Metadata-Flavor: ibm" -d '{"expires_in": 600}' | jq -r '(.access_token)'
 ```
 
-## Step2: Generate IAM token if a TP was already attached to the instance during VM creation
+## Step 2: Generate IAM token if a Trusted Profile was already attached to the instance during VM creation
 ```
 iam_token=$(curl -s -X POST https://api.metadata.cloud.ibm.com/instance_identity/v1/iam_token?version=2024-11-12 \
   -H "Authorization: Bearer $instance_identity_token" | jq -r '.access_token'
@@ -11,7 +11,7 @@ iam_token=$(curl -s -X POST https://api.metadata.cloud.ibm.com/instance_identity
 
 **Or** 
 
-## Step2: Generate IAM token if TP was attached later after instance creation
+## Step 2: Generate IAM token if Trusted Profile was attached later after instance creation
 
 ### 2.1 List the trusted profiles
        `curl -d "cr_token=${instance_identity_token}" "https://iam.cloud.ibm.com/identity/profiles"`
@@ -42,7 +42,7 @@ Replace the value below in place:  **ACCOUNT_ID**
 curl -X GET "https://private.iam.cloud.ibm.com/v2/policies?account_id=ACCOUNT_ID" -H 'Content-Type: application/json' -H "Authorization: $iam_token" -s| jq .
 ```
 
-## Step4: Get VM deatils
+## Step 4: Get VM details
 ```
 curl -X GET "https://api.metadata.cloud.ibm.com/metadata/v1/instance/initialization?version=2024-11-12"    -H "Accept: application/json"    -H "Authorization: Bearer $instance_identity_token"    | jq -r
 ```

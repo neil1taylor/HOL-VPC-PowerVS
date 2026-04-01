@@ -19,7 +19,7 @@ Resource Type | Name | Notes
 ---------|----------|---------
 Power Workspace | <TEAM_NAME>-powervs-wksp
 Private Subnet | <TEAM_NAME>-power-db-sn
-PowerVS VSI | <TEAM_NAME>db-powervs-vsi
+PowerVS VSI | <TEAM_NAME>-db-powervs-vsi
 
 This document references:
 
@@ -41,7 +41,7 @@ In this HOL we will:
 
 ### Step 1: Create PowerVS Workspace
 
-1. Create a PowerVS workspace that will contain all your Power Virtual Server resources. Follow the instructions at[Creating a Power Virtual Server workspace](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-creating-power-virtual-server#creating-service) using the following parameters:
+1. Create a PowerVS workspace that will contain all your Power Virtual Server resources. Follow the instructions at [Creating a Power Virtual Server workspace](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-creating-power-virtual-server#creating-service) using the following parameters:
 
    - **Location type**: `IBM datacenter`
    - **Location**: Dallas (us-south)
@@ -51,15 +51,15 @@ In this HOL we will:
 
 ### Step 2: Verify SSH Key
 
-1. From the newly created workspace, navigate to **SSH Keys** and ensure yor SSH keys are listed. If not then paste your public key into the text box that you created in HOL1
+1. From the newly created workspace, navigate to **SSH Keys** and ensure your SSH keys are listed. If not then paste your public key into the text box that you created in HOL1
 
 ### Step 3: Set Up Networks
 
 1. Follow the instructions at [Configuring a private network subnet](https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-configuring-subnet) to create a private subnet using the following parameters:
    
    - **Network name**: <TEAM_NAME>-power-db-sn
-   - **CIDR**: 10.<TEAM_NUMBER>.8.0/24
-   - **Gateway**: 10.<TEAM_NUMBER>.8.1
+   - **CIDR**: 10.<TEAM_ID_NUMBER>.8.0/24
+   - **Gateway**: 10.<TEAM_ID_NUMBER>.8.1
    - **DNS servers**: Use one of the IP addresses from your private DNS custom resolvers
    - **MTU**: 9000
 
@@ -76,7 +76,7 @@ workspaceID=`ibmcloud pi workspace ls 2>&1 | grep <TEAM_NAME>-powervs-wksp | awk
 ibmcloud pi workspace target $workspaceID
 
 # Get the ID of the subnet
-subnetID=$(ibmcloud pi subnet list --json | jq -r ' .networks.[] | select(.name=="<TEAM_Name>-power-db-sn") | .networkID')
+subnetID=$(ibmcloud pi subnet list --json | jq -r '.networks[] | select(.name=="<TEAM_NAME>-power-db-sn") | .networkID')
 
 # Get info on the subnet
 ibmcloud pi subnet get $subnetID
@@ -100,13 +100,13 @@ ibmcloud pi subnet get $subnetID
    - **Memory**: `2`
    - **Public networks**: `Disable`
    - **Network**: `<TEAM_NAME>-power-db-sn`
-   - **IP Address**: `10.<TEAM_ID>.8.2`
+   - **IP Address**: `10.<TEAM_ID_NUMBER>.8.2`
 
 2. To verify use the following commands:
  
 ```bash
 # Get instance ID
-instanceID=$(ibmcloud pi instance list --json | jq -r '.pvmInstances.[] | select(.name=="<TEAM_NAME>-db-powervs-vsi") | .id')
+instanceID=$(ibmcloud pi instance list --json | jq -r '.pvmInstances[] | select(.name=="<TEAM_NAME>-db-powervs-vsi") | .id')
 ibmcloud pi instance get $instanceID
 ```
 
@@ -119,13 +119,13 @@ Network Security groups enablement and configuration takes a little while, pleas
 
     - **Network address groups**:
       - **Name**: `mgmt-servers`
-      - **CIDR**: `10.<TEAM_NUMBER>.1.0/24`
+      - **CIDR**: `10.<TEAM_ID_NUMBER>.1.0/24`
       - **Name**: `vpn-subnet`
-      - **CIDR**: `10.<TEAM_NUMBER>.0.0/24`
+      - **CIDR**: `10.<TEAM_ID_NUMBER>.0.0/24`
       - **Name**: `vpe-subnet`
-      - **CIDR**: `10.<TEAM_NUMBER>.2.0/24`
+      - **CIDR**: `10.<TEAM_ID_NUMBER>.2.0/24`
       - **Name**: `app1-app-sn`
-      - **CIDR**: `10.<TEAM_NUMBER>.4.64/26`
+      - **CIDR**: `10.<TEAM_ID_NUMBER>.4.64/26`
     - **Network security groups**:
       - **Name**: `allow-nsg` 
       - **Inbound rules**:
@@ -135,11 +135,11 @@ Network Security groups enablement and configuration takes a little while, pleas
             - **Remote**:` mgmt-servers`
           - **Action**: `Allow`
             - **Source**: `22`
-            - **Remote**:` vpn-servers`
+            - **Remote**: `vpn-subnet`
           - **Action**: `Allow`
             - **Remote**: `app1-app-sn`
             - **Destination port range**: `5432-5432`
-      - **Members**: `<TEAM_NAME>db-powervs-vsi`
+      - **Members**: `<TEAM_NAME>-db-powervs-vsi`
 
 ## Questions
 

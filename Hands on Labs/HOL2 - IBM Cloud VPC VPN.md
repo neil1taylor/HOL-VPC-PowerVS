@@ -98,14 +98,15 @@ The steps are as follows:
 3. In the Create tab:
 
     * **Region**: `Dallas (us-south)`
-    * **Pricing Plan**: `Free`
+    * **Pricing Plan**: `Trial`
     * **Name**: `<TEAM_NAME>-secrets-mgr-svc`
     * **Resource group**: `<TEAM_NAME>-services-rg`
     * **Tags**: `env:mgmt`
     * **Endpoints**: `Public and private`
 
-4. Agree to the terms and click **Create**.
-5. Wait until the service is created, this can take 5 - 15 minutes
+4. **Important**: Ensure you select **Public and private** for the Endpoints setting. If the instance is created with private-only endpoints, the CLI commands in subsequent steps will not work from outside the VPC.
+5. Agree to the terms and click **Create**.
+6. Wait until the service is created, this can take 5 - 15 minutes.
 
 ### Step 2: Create a Secrets Group
 
@@ -120,10 +121,21 @@ We will create a group to contain the certificates.
 For information only, the following CLI would create the group
 
 ```bash
-# Set environment variables
+# Target the services resource group
+ibmcloud target -g <TEAM_NAME>-services-rg
+
+# Set the Secrets Manager service URL
 GUID=$(ibmcloud resource service-instance <TEAM_NAME>-secrets-mgr-svc --output json | jq -r '.[].guid')
 export SECRETS_MANAGER_URL="https://$GUID.us-south.secrets-manager.appdomain.cloud"
-export SECRET_GROUP_ID=`ibmcloud secrets-manager secret-group-create --name vpn-certificates --description "VPN certificate management" --service-url ${SECRETS_MANAGER_URL} --output json | jq -r '.id'`; echo $SECRET_GROUP_ID
+ibmcloud secrets-manager config set service-url $SECRETS_MANAGER_URL
+
+# Create the secret group
+export SECRET_GROUP_ID=$(ibmcloud secrets-manager secret-group-create \
+--name vpn-certificates \
+--description "VPN certificate management" \
+--service-url ${SECRETS_MANAGER_URL} \
+--output json | jq -r '.id')
+echo $SECRET_GROUP_ID
 ```
 
 ### Step 3: Create Root Certificate Authority (CA)
@@ -195,21 +207,18 @@ For information only, the following CLI command would create the server template
 ibmcloud secrets-manager configuration-create \
 --name vpn-server-template \
 --config-type private_cert_configuration_template \
---private-cert-server-flag true \
---private-cert-client-flag false \
+--private-cert-server-flag \
 --private-cert-ca-name vpn-intermediate-ca \
 --private-cert-max-ttl 26280h \
 --private-cert-ttl 26280h \
 --private-cert-private-key-type rsa \
 --private-cert-private-key-bits 4096 \
---private-cert-allow-bare-domains true \
---private-cert-allow-subdomains true \
---private-cert-allow-glob-domains true\
---private-cert-allow-wildcard true \
---private-cert-allow-any-name true \
---private-cert-enforce-hostname false \
---private-cert-allow-ip-sans true \
---private-cert-allowed-uri-sans true \
+--private-cert-allow-bare-domains \
+--private-cert-allow-subdomains \
+--private-cert-allow-glob-domains \
+--private-cert-allow-wildcard \
+--private-cert-allow-any-name \
+--private-cert-allow-ip-sans \
 --private-cert-allowed-secret-groups $SECRET_GROUP_ID
 ```
 
@@ -219,21 +228,18 @@ ibmcloud secrets-manager configuration-create \
 ibmcloud secrets-manager configuration-create \
 --name vpn-client-template \
 --config-type private_cert_configuration_template \
---private-cert-server-flag false \
---private-cert-client-flag true \
+--private-cert-client-flag \
 --private-cert-ca-name vpn-intermediate-ca \
 --private-cert-max-ttl 26280h \
 --private-cert-ttl 26280h \
 --private-cert-private-key-type rsa \
 --private-cert-private-key-bits 4096 \
---private-cert-allow-bare-domains true \
---private-cert-allow-subdomains true \
---private-cert-allow-glob-domains true\
---private-cert-allow-wildcard true \
---private-cert-allow-any-name true \
---private-cert-enforce-hostname false \
---private-cert-allow-ip-sans true \
---private-cert-allowed-uri-sans true \
+--private-cert-allow-bare-domains \
+--private-cert-allow-subdomains \
+--private-cert-allow-glob-domains \
+--private-cert-allow-wildcard \
+--private-cert-allow-any-name \
+--private-cert-allow-ip-sans \
 --private-cert-allowed-secret-groups $SECRET_GROUP_ID
 ```
 
@@ -243,10 +249,10 @@ ibmcloud secrets-manager configuration-create \
 2. Click the **Add** button.
 3. Select the **Private certificates** tile.
 4. Click Next.
-5. In th dialog boxes use the following:
+5. In the dialog boxes use the following:
 
     * **Name**: `vpn-server-cert`
-    * **Certificate authority**: `vpn-intermediat-ca`
+    * **Certificate authority**: `vpn-intermediate-ca`
     * **Template**: `vpn-server-template`
     * **Certificate common name**: `*.vpn.local`
     * **Secret group**: `vpn-certificates`
@@ -261,7 +267,7 @@ ibmcloud secrets-manager secret-create \
 --secret-type private_cert \
 --secret-group-id $SECRET_GROUP_ID \
 --private-cert-template-name vpn-server-template \
---certificate-common-name *.vpn.local
+--certificate-common-name "*.vpn.local"
 ```
 
 ### Step 7: Generate Client Certificates
@@ -299,7 +305,7 @@ The steps are as follows:
 * Step 2: Configure VPN Server Routes
 * Step 3: Connect to the VPC via the VPN
 * Step 4: Get the Windows password
-* Step 5: Connect to th Management Servers
+* Step 5: Connect to the Management Servers
 
 ### Step 1: Create client-to-site VPN
 
@@ -345,10 +351,10 @@ To create a client-to-site VPN server in the console:
 For information only, if you used the CLI, the commands would be similar to the following:
 
 ```bash
-vpn_server_cert_crn=$(ibmcloud secrets-manager secrets --output JSON | jq -r '.secrets.[] | select(.name=="vpn-server-cert") | .crn')
-vpn_client_cert_crn=$(ibmcloud secrets-manager secrets --output JSON | jq -r '.secrets.[] | select(.name=="vpn-client-user1") | .crn')
-target_security_group_id=$(ibmcloud is security-group team1-mgmt-sg  --output JSON | jq -r '.id')
-subnet_1_id=$(ibmcloud is subnet team1-vpn-sn --output JSON | jq -r '.id')
+vpn_server_cert_crn=$(ibmcloud secrets-manager secrets --output json | jq -r '.resources[] | select(.name=="vpn-server-cert") | .crn')
+vpn_client_cert_crn=$(ibmcloud secrets-manager secrets --output json | jq -r '.resources[] | select(.name=="vpn-client-user1") | .crn')
+target_security_group_id=$(ibmcloud is security-group <TEAM_NAME>-mgmt-sg --output JSON | jq -r '.id')
+subnet_1_id=$(ibmcloud is subnet <TEAM_NAME>-vpn-sn --output JSON | jq -r '.id')
 
 ibmcloud is vpn-server-create \
 --subnet $subnet_1_id \
@@ -356,14 +362,14 @@ ibmcloud is vpn-server-create \
 --cert $vpn_server_cert_crn \
 --client-auth-methods certificate \
 --client-ca $vpn_client_cert_crn \
---client-dns 10.1.2.4,10.1.2.5 \
+--client-dns 10.<TEAM_ID_NUMBER>.2.4,10.<TEAM_ID_NUMBER>.2.5 \
 --client-idle-timeout 3600 \
 --enable-split-tunnel true \
 --port 443 \
 --protocol udp \
---sg team1-vpn-sg \
---name team1-client-server-vpn \
---resource-group-name team1-management-rg
+--sg <TEAM_NAME>-vpn-sg \
+--name <TEAM_NAME>-client-server-vpn \
+--resource-group-name <TEAM_NAME>-management-rg
 ```
 
 ### Step 2: Configure VPN Server Routes
@@ -376,7 +382,7 @@ ibmcloud is vpn-server-create \
 
     # Add route for VPC subnet
     ibmcloud is vpn-server-route-create $VPN_SERVER_ID \
-    --destination "10.<TEAM_NUMBER>.0.0/20" \
+    --destination "10.<TEAM_ID_NUMBER>.0.0/20" \
     --action translate
     ```
 
@@ -390,8 +396,8 @@ After you create the VPN server using the newly created certificate, you can set
 4. Click Browse to select and import the .ovpn file (client profile).
 5. To connect, click Connect.
 6. Ensure that the VPN becomes **connected**.
-7. To verify, in a console session use the command `ping 10.<TEAM_NUMBER>.1.4`. This will fail. Why? Troubleshot the issue, and as a hint review the relevant security groups. Add the required icmp rule.
-8. Once rectified, test with a FQDN with ping `<TEAM_NAME>-mgmt-02-vsi.team<TEAM_NUMBER>.hol.cloud`
+7. To verify, in a console session use the command `ping 10.<TEAM_ID_NUMBER>.1.4`. This will fail. Why? Troubleshoot the issue, and as a hint review the relevant security groups. Add the required icmp rule.
+8. Once rectified, test with a FQDN with ping `<TEAM_NAME>-mgmt-02-vsi.team<TEAM_ID_NUMBER>.hol.cloud`
 
 ### Step 4: Get the Windows password
 
@@ -409,10 +415,10 @@ After you create the VPN server using the newly created certificate, you can set
 
 ### Step 5: Connect to the Management Servers
 
-1. Using SSH, connect to `ssh -i ~/.ssh/hol-key root@<TEAM_NAME>-mgmt-01-vsi.<TEAM_NAME>.hol.cloud`.
-2. Type `cat /var/log/userdata.log` and ensure you something like `Sun Jun  1 10:14:37 UTC 2025: IBM Cloud CLI and tools installation completed` that was generated by the cloud-init user-data file we used.
+1. Using SSH, connect to `ssh -i ~/.ssh/hol-key ubuntu@<TEAM_NAME>-mgmt-01-vsi.team<TEAM_ID_NUMBER>.hol.cloud`.
+2. Type `cat /var/log/userdata.log` and ensure you see something like `Sun Jun  1 10:14:37 UTC 2025: IBM Cloud CLI and tools installation completed` that was generated by the cloud-init user-data file we used.
 3. Exit from the ssh session.
-4. Use RDP to the connect to the Windows server using the FQDN <TEAM_NAME>-mgmt-02-vsi.team<TEAM_NUMBER>.hol.cloud. 
+4. Use RDP to the connect to the Windows server using the FQDN <TEAM_NAME>-mgmt-02-vsi.team<TEAM_ID_NUMBER>.hol.cloud. 
 5. The credentials for the VSI are:
 
     * **Username**: Administrator
@@ -422,7 +428,7 @@ After you create the VPN server using the newly created certificate, you can set
 
 ## VPC Site-to-site VPN
 
-This guide walks through connecting two IBM Cloud VPCs using a site-to-site VPN connection, enabling secure communication between resources in different VPCs. You will work with a neighboring team to connect your VPCs. It is important that there are no overlapping subnet CIDR blocks used in both VPCs which is why te IP addressing scheme has been designed around 10.<TEAM_NUMBER>.x.x.
+This guide walks through connecting two IBM Cloud VPCs using a site-to-site VPN connection, enabling secure communication between resources in different VPCs. You will work with a neighboring team to connect your VPCs. It is important that there are no overlapping subnet CIDR blocks used in both VPCs which is why the IP addressing scheme has been designed around 10.<TEAM_ID_NUMBER>.x.x.
 
 The steps are as follows:
 
@@ -559,9 +565,10 @@ echo "$CA_CERT" | jq -r '.certificate' > ca.crt
 ibmcloud is vpn-server-create \
   --name my-vpn-server \
   --subnet $SUBNET_ID \
-  --security-group $SG_ID \
-  --certificate-crn "crn:v1:bluemix:public:secrets-manager:us-south:a/<account-id>:<instance-id>::secret<server-cert-id>" \
-  --client-certificate-crn "crn:v1:bluemix:public:secrets-manager:us-south:a/<account-id>:<instance-id>::secret<ca-cert-id>" \
+  --sg $SG_ID \
+  --cert "crn:v1:bluemix:public:secrets-manager:us-south:a/<account-id>:<instance-id>::secret<server-cert-id>" \
+  --client-ca "crn:v1:bluemix:public:secrets-manager:us-south:a/<account-id>:<instance-id>::secret<ca-cert-id>" \
+  --client-auth-methods certificate \
   --client-ip-pool "172.16.0.0/22" \
   --protocol udp \
   --port 1194
