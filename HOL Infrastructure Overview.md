@@ -118,7 +118,7 @@ Subnet Address | Range of Addresses | Usable IPs | Hosts | Note
 10.1.0.0/22 | 10.1.0.0 - 10.1.3.255 | 10.1.0.1 - 10.1.3.254 | 1022 | VPC-Management
 10.1.4.0/22 | 10.1.4.0 - 10.1.7.255 | 10.1.4.1 - 10.1.7.254 | 1022 | VPC-App1
 10.1.8.0/22 | 10.1.8.0 - 10.1.11.255 | 10.1.8.1 - 10.1.11.254 | 1022 | PowerVS-DB
-10.1.12.0/22 | 10.1.12.0 - 10.1.15.255 | 10.1.12.1 - 10.1.15.254 | 1022 | Spare
+10.1.12.0/22 | 10.1.12.0 - 10.1.15.255 | 10.1.12.1 - 10.1.15.254 | 1022 | DNS Resolver (us-south-2)
 
 #### VPC-Management
 
@@ -126,10 +126,12 @@ Subnet Address | Range of Addresses | Usable IPs | Hosts | Note
 
 Subnet Address | Range of Addresses | Usable IPs | Hosts | Note
 ---|---|---|---|---
-10.1.0.0/24 | 10.1.0.0 - 10.1.0.255 | 10.1.0.1 - 10.1.0.254 | 254 | VPN
-10.1.1.0/24 | 10.1.1.0 - 10.1.1.255 | 10.1.1.1 - 10.1.1.254 | 254 | Management
-10.1.2.0/24 | 10.1.2.0 - 10.1.2.255 | 10.1.2.1 - 10.1.2.254 | 254 | VPE
+10.1.0.0/24 | 10.1.0.0 - 10.1.0.255 | 10.1.0.1 - 10.1.0.254 | 254 | VPN (us-south-1)
+10.1.1.0/24 | 10.1.1.0 - 10.1.1.255 | 10.1.1.1 - 10.1.1.254 | 254 | Management (us-south-1)
+10.1.2.0/24 | 10.1.2.0 - 10.1.2.255 | 10.1.2.1 - 10.1.2.254 | 254 | VPE (us-south-1)
 10.1.3.0/24 | 10.1.3.0 - 10.1.3.255 | 10.1.3.1 - 10.1.3.254 | 254 | Spare
+
+Note: DNS custom resolvers require locations in two different availability zones. A subnet `10.<TEAM_ID>.12.0/24` in us-south-2 is used for the second resolver location (see the DNS Resolver /22 block above).
 
 The reserved IP addresses for the subnet **Management** are as follows:
 

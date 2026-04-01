@@ -148,3 +148,18 @@ You will have noticed that the PowerVS does not have access to the Internet. We 
 
 7. Type `source ~/.bash_profile`. 
 8. Test the Proxy with `curl -I https://www.google.com`. If the proxy is configured correctly, you should see the HTTP headers from Google and `HTTP/1.1 200 Connection established`
+
+## Questions
+
+Use [IBM Cloud Transit Gateway](https://cloud.ibm.com/docs/transit-gateway?topic=transit-gateway-getting-started) to help you answer the following:
+
+1. What is IBM Cloud Transit Gateway and what connectivity problem does it solve?
+2. What is the difference between local routing and global routing on a Transit Gateway?
+3. What types of networks can be connected to a Transit Gateway?
+4. How does Transit Gateway provide high availability and fault tolerance within a Multi-Zone Region?
+5. What is a route report and how can it be used to troubleshoot connectivity issues?
+6. When using a bastion host (jump host) for SSH, what is the purpose of the `-J` flag in the SSH command?
+7. Why can't the PowerVS VSI access the internet directly, and what approach was used in this lab to provide internet access?
+8. What is the role of a forward proxy (such as Squid) in providing internet access to private resources, and what security considerations should be applied?
+9. When troubleshooting connectivity between VPC and PowerVS, what are the key components to check (list at least five)?
+10. Explain why DNS resolution may fail from a PowerVS VSI when connected via Transit Gateway, and what Network Security Group rule is needed to resolve this.

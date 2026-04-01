@@ -697,3 +697,4 @@ Complete the following steps to configure streaming:
 7. When would you use the extract parsing rule? and the block rule?
 8. When should you configure a logging agent?
 9. How many query languages can you use to search data in Cloud Logs?
+10. What are the three data pipelines in the TCO Optimizer, and how do they differ in terms of cost and query capabilities?

@@ -285,6 +285,19 @@ terraform apply
 
 
 
+## Questions
+
+1. What is IBM Cloud Schematics and how does it relate to Terraform?
+2. What are the advantages of using custom route tables instead of relying solely on security groups for network segmentation?
+3. In a three-tier architecture, why should the database tier have internet access blocked, and how is this achieved with route tables?
+4. What is the difference between a Terraform plan and a Terraform apply operation?
+5. How does Schematics manage Terraform state, and what advantages does this provide over local state management?
+6. What is cloud-init user data and how is it used to configure VSIs at provisioning time?
+7. Explain the Principle of Least Privilege as it applies to the custom routing configuration in this lab.
+8. What compliance standards (e.g., PCI DSS, HIPAA) require network segmentation, and how does this lab's architecture address that requirement?
+9. How would you modify the Terraform configuration to deploy the same infrastructure in a different region or with different CIDR blocks?
+10. What is the purpose of connecting the App1 VPC to the Transit Gateway, and what connectivity does this enable?
+
 ## Additional Information
 
 ### Important Considerations for IBM Schematics
